@@ -33,7 +33,12 @@ async function main() {
 
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`);
-    await collectCmd.runCommand({numberOfRuns, url, method: 'node', settings: ciSettings});
+    await collectCmd.runCommand({
+      numberOfRuns, 
+      url,
+      method: 'node',
+      additive: 'true',
+      settings: ciSettings});
     core.startGroup(`End ci ${url}`);
   }
 
