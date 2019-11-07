@@ -5,24 +5,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Multiple URLs
+      - name: Upload to public-repo
         uses: ./
         with:
           urls: |
-            https://alekseykulikov.com/
-            https://alekseykulikov.com/blog
-            https://alekseykulikov.com/not-found
+            https://exterkamp.codes/
           extraHeaders: '{"x-github-action":"true"}'
           runs: 2
-      - name: One URL with custom config and options
+      - name: Upload to secret-server with secret key
         uses: ./
         with:
-          url: 'https://alekseykulikov.com/'
+          lhci_server: ${{ secrets.LHCI_SERVER }}
+          api_token: ${{ secrets.LHCI_TOKEN }}
+          url: 'https://exterkamp.codes/'
           chromeFlags: '--window-size=1200,800'
           configPath: .github/lighthouse/desktop-config.js
           throttlingMethod: devtools
-          onlyCategories: 'performance,seo'
-          runs: 1
+          onlyCategories: 'performance'
+          runs: 3
+          extraHeaders: '{"x-github-action":"true"}'
       - name: Upload artifacts
         uses: actions/upload-artifact@master
         with:

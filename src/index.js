@@ -2,6 +2,8 @@ const { mapKeys } = require('lodash')
 const core = require('@actions/core')
 // @ts-ignore
 const collectCmd = require('@lhci/cli/src/collect/collect.js')
+// @ts-ignore
+const uploadCmd = require('@lhci/cli/src/upload/upload.js')
 const { join } = require('path')
 
 // audit urls with Lighthouse CI
@@ -34,21 +36,45 @@ async function main() {
 
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
+    // Collect
     await collectCmd.runCommand({
       numberOfRuns,
       url,
       method: 'node',
-      additive: 'true',
+      // additive: 'true',
       settings: ciSettings
     })
+    // Assert!
+    // TODO(exterkamp): assertCmd
+
+    // Upload!
+    core.startGroup(`Uploading LHRs`)
+
+    let uploadSettings = {}
+    if (getLhciServer()) {
+      uploadSettings = {
+        target: 'lhci',
+        serverBaseUrl: getLhciServer(),
+        token: getApiToken(),
+        // TODO(exterkamp): this is a default arg...
+        urlReplacementPatterns: [
+          's#:[0-9]{3,5}/#:PORT/#', // replace ports
+          's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig' // replace UUIDs
+        ]
+      }
+    } else {
+      uploadSettings = { target: 'temporary-public-storage' }
+    }
+    await uploadCmd.runCommand(uploadSettings)
+    core.endGroup()
+
     core.startGroup(`End ci ${url}`)
   }
-
-  core.setOutput('resultsPath', '.lighthouseci')
+  // TODO(exterkamp): cool to save all LHRs from a run as artifacts in gh-actions?
+  // core.setOutput('resultsPath', '.lighthouseci')
 }
 
 // run `main()`
-
 main()
   .catch(
     /** @param {Error} err */ err => {
@@ -62,7 +88,7 @@ main()
   })
 
 /**
- * Get urls from `url` or `urls`
+ * Get urls from `url` or `urls`.
  *
  * @return {string[]}
  */
@@ -84,6 +110,28 @@ function getRuns() {
   // Get num of runs || LHCI default of 3
   const numberOfRuns = parseInt(core.getInput('runs') || '3')
   return numberOfRuns
+}
+
+/**
+ * Get the address of the LH CI server to upload LHRs to.
+ *
+ * @return {string | null}
+ */
+function getLhciServer() {
+  const target = core.getInput('lhci_server')
+  if (!target) return null
+  return target
+}
+
+/**
+ * Get the API Token to use to upload LHRs to the LH CI server.
+ *
+ * @return {string | null}
+ */
+function getApiToken() {
+  const token = core.getInput('api_token')
+  if (!token) return null
+  return token
 }
 
 /** @return {object} */
