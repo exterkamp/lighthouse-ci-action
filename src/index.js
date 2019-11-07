@@ -1,12 +1,13 @@
 const { mapKeys } = require('lodash')
-const core = require('@actions/core');
-const collectCmd = require('@lhci/cli/src/collect/collect.js');
+const core = require('@actions/core')
+// @ts-ignore
+const collectCmd = require('@lhci/cli/src/collect/collect.js')
 const { join } = require('path')
 
 // audit urls with Lighthouse CI
 async function main() {
   const urls = getUrls()
-  const numberOfRuns = getRuns();
+  const numberOfRuns = getRuns()
   const baseConfig = getConfig()
   const baseSettings = baseConfig.settings || {}
   const config = {
@@ -22,24 +23,25 @@ async function main() {
     chromeFlags: getChromeFlags().join(' '),
     config,
     settings: {
-      logLevel: 'info',
-    },
-  };
+      logLevel: 'info'
+    }
+  }
   core.startGroup('Lighthouse config')
   console.log('urls: %s', urls)
   console.log('config: %s', JSON.stringify(config, null, '  '))
-  console.log('ci settings: %s', JSON.stringify(ciSettings, null, '  '));
+  console.log('ci settings: %s', JSON.stringify(ciSettings, null, '  '))
   core.endGroup()
 
   for (const url of urls) {
-    core.startGroup(`Start ci ${url}`);
+    core.startGroup(`Start ci ${url}`)
     await collectCmd.runCommand({
-      numberOfRuns, 
+      numberOfRuns,
       url,
       method: 'node',
       additive: 'true',
-      settings: ciSettings});
-    core.startGroup(`End ci ${url}`);
+      settings: ciSettings
+    })
+    core.startGroup(`End ci ${url}`)
   }
 
   core.setOutput('resultsPath', '.lighthouseci')
@@ -80,8 +82,8 @@ function getUrls() {
 
 function getRuns() {
   // Get num of runs || LHCI default of 3
-  const numberOfRuns = parseInt(core.getInput('runs') || '3');
-  return numberOfRuns;
+  const numberOfRuns = parseInt(core.getInput('runs') || '3')
+  return numberOfRuns
 }
 
 /** @return {object} */
