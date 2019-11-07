@@ -7,12 +7,12 @@
   resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.1.1.tgz#e08f3dbfe04721bb3d040f8fca2d6d7e1817b2e1"
   integrity sha512-O5G6EmlzTVsng7VSpNtszIoQq6kOgMGNTFB/hmwKNNA4V71JyxImCIrL27vVHCt2Cb3ImkaCr6o27C2MV9Ylwg==
 
-"@lhci/cli@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@lhci/cli/-/cli-0.2.0.tgz#f59a9b87052aa79f8d1b014eb04b445fe5ae5316"
-  integrity sha512-rnhRc7BEOcEVLVa5KQaIw4mfqs4/9ZRu9YuHGzUj9rK5fDL2PRU9unAZNGlssQipNSiYADm0N1G0QM063yTTEg==
+"@lhci/cli@0.2.1-alpha.3":
+  version "0.2.1-alpha.3"
+  resolved "https://registry.yarnpkg.com/@lhci/cli/-/cli-0.2.1-alpha.3.tgz#786eada245e494fa84dffb695c69dc03ecb05ef7"
+  integrity sha512-vqvH2ZYaaErE3G7yifX25uBY4PLkJ3oT1BCxQaUupspzxAc0k1r6jhsONBS5IfTe334rUOn4RQM4M7firJ0iqQ==
   dependencies:
-    "@lhci/utils" "0.2.0"
+    "@lhci/utils" "0.2.1-alpha.3"
     compression "^1.7.4"
     express "^4.17.1"
     inquirer "^6.3.1"
@@ -21,10 +21,10 @@
     tmp "^0.1.0"
     yargs "^12.0.5"
 
-"@lhci/utils@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@lhci/utils/-/utils-0.2.0.tgz#e4d1026a7cbe84a731cc279ddaf950981fc1f1e4"
-  integrity sha512-isVuvfGDszUC7PQ4a/588QX+GWvZW5hT8GT57ST/ovZ5rwxKBZFunrPsAk+QXbR5ZQXQkVv7OyvPCuh38m8ZEg==
+"@lhci/utils@0.2.1-alpha.3":
+  version "0.2.1-alpha.3"
+  resolved "https://registry.yarnpkg.com/@lhci/utils/-/utils-0.2.1-alpha.3.tgz#4625d036e701fbb684abef07d3a648f310f722f8"
+  integrity sha512-HbUOEGm/W23d/L39pfN8vkjtxlWr3/qxN2/wzlbr49ZswRNzXoHiRdDUVKnBvYS+cQ/d2GUbQ5m42YqHHUuKUg==
   dependencies:
     isomorphic-fetch "^2.2.1"
 
