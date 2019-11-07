@@ -12,8 +12,8 @@ jobs:
             https://alekseykulikov.com/
             https://alekseykulikov.com/blog
             https://alekseykulikov.com/not-found
-          budgetPath: .github/lighthouse/budget.json
           extraHeaders: '{"x-github-action":"true"}'
+          runs: 2
       - name: One URL with custom config and options
         uses: ./
         with:
@@ -22,8 +22,9 @@ jobs:
           configPath: .github/lighthouse/desktop-config.js
           throttlingMethod: devtools
           onlyCategories: 'performance,seo'
+          runs: 1
       - name: Upload artifacts
         uses: actions/upload-artifact@master
         with:
           name: lighthouse-results
-          path: './results'
+          path: './lighthouseci'

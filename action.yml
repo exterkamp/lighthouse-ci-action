@@ -5,6 +5,8 @@ inputs:
     description: 'Page URL'
   urls:
     description: 'List of URLs'
+  runs:
+    description: 'Number of runs to do per URL'
 outputs:
   resultsPath:
     description: 'Path to the folder with results'

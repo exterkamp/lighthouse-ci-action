@@ -1,22 +1,12 @@
 const { mapKeys } = require('lodash')
-const core = require('@actions/core')
-const lighthouse = require('lighthouse')
-const { getFilenamePrefix } = require('lighthouse/lighthouse-core/lib/file-namer')
-const chromeLauncher = require('chrome-launcher')
-const { ensureDir } = require('fs-extra')
+const core = require('@actions/core');
+const collectCmd = require('@lhci/cli/src/collect/collect.js');
 const { join } = require('path')
-const { writeFile } = require('fs').promises
-const { readFileSync } = require('fs')
 
-// audit urls with Lighthouse
-
+// audit urls with Lighthouse CI
 async function main() {
   const urls = getUrls()
-  const resultsPath = join(process.cwd(), 'results')
-  const flags = {
-    output: 'html',
-    logLevel: 'info'
-  }
+  const numberOfRuns = getRuns();
   const baseConfig = getConfig()
   const baseSettings = baseConfig.settings || {}
   const config = {
@@ -25,57 +15,29 @@ async function main() {
       ...baseSettings,
       throttlingMethod: core.getInput('throttlingMethod') || baseSettings.throttlingMethod || 'simulate',
       onlyCategories: getOnlyCategories() || baseSettings.onlyCategories,
-      budgets: getBudgets() || baseSettings.budgets,
       extraHeaders: getExtraHeaders() || baseSettings.extraHeaders
     }
   }
+  const ciSettings = {
+    chromeFlags: getChromeFlags().join(' '),
+    config,
+    settings: {
+      logLevel: 'info',
+    },
+  };
   core.startGroup('Lighthouse config')
   console.log('urls: %s', urls)
   console.log('config: %s', JSON.stringify(config, null, '  '))
+  console.log('ci settings: %s', JSON.stringify(ciSettings, null, '  '));
   core.endGroup()
 
-  let chrome = null
-  try {
-    core.startGroup('Launch Chrome')
-    /** @type {import('chrome-launcher').Options} */
-    const chromeOpts = {
-      port: 9222,
-      logLevel: 'info',
-      chromeFlags: getChromeFlags()
-    }
-    console.log('Chrome launch options: %j', chromeOpts)
-    chrome = await chromeLauncher.launch(chromeOpts)
-    core.endGroup()
-
-    /** @type {string[]} */
-    const failedUrls = []
-
-    await ensureDir(resultsPath)
-    for (const url of urls) {
-      core.startGroup(`Audit ${url}`)
-      const { report, lhr } = await lighthouse(url, { ...flags, port: chrome.port }, config)
-      const reportPath = join(resultsPath, getFilenamePrefix(lhr))
-      await writeFile(reportPath + '.html', report)
-      await writeFile(reportPath + '.json', JSON.stringify(lhr, null, '  '))
-      // TODO: print table with result
-      core.endGroup()
-      const perfBudget = lhr.audits['performance-budget']
-      if (perfBudget !== undefined) {
-        if (isOverBudget(lhr)) failedUrls.push(url)
-      }
-    }
-    core.setOutput('resultsPath', resultsPath)
-
-    // fail last
-    if (failedUrls.length) {
-      core.setFailed(
-        `Performance budget fails for ${failedUrls.length} URL${failedUrls.length === 1 ? '' : 's'}` +
-          ` (${failedUrls.join(', ')})`
-      )
-    }
-  } finally {
-    if (chrome) await chrome.kill()
+  for (const url of urls) {
+    core.startGroup(`Start ci ${url}`);
+    await collectCmd.runCommand({numberOfRuns, url, method: 'node', settings: ciSettings});
+    core.startGroup(`End ci ${url}`);
   }
+
+  core.setOutput('resultsPath', '.lighthouseci')
 }
 
 // run `main()`
@@ -105,6 +67,18 @@ function getUrls() {
   return urls.split('\n').map(url => url.trim())
 }
 
+/**
+ * Get the number of runs.
+ *
+ * @return {number | null}
+ */
+
+function getRuns() {
+  // Get num of runs || LHCI default of 3
+  const numberOfRuns = parseInt(core.getInput('runs') || '3');
+  return numberOfRuns;
+}
+
 /** @return {object} */
 function getConfig() {
   const configPath = core.getInput('configPath')
@@ -120,13 +94,6 @@ function getOnlyCategories() {
   const onlyCategories = core.getInput('onlyCategories')
   if (!onlyCategories) return null
   return onlyCategories.split(',').map(category => category.trim())
-}
-
-/** @return {object | null} */
-function getBudgets() {
-  const budgetPath = core.getInput('budgetPath')
-  if (!budgetPath) return null
-  return JSON.parse(readFileSync(join(process.cwd(), budgetPath), 'utf8'))
 }
 
 /** @return {object | null} */
@@ -151,22 +118,9 @@ function getExtraHeaders() {
  */
 
 function getChromeFlags() {
+  // TODO(exterkamp): are these good defaults?
   const flags = ['--headless', '--disable-gpu', '--no-sandbox', '--no-zygote']
   const chromeFlags = core.getInput('chromeFlags')
   if (chromeFlags) flags.push(...chromeFlags.split(' '))
   return flags
-}
-
-/**
- * Check if the performance budget exceed,
- * by looking at `sizeOverBudget` at `lhr.audits['performance-budget'].details.items`
- *
- * @param {object} lhr
- * @return {boolean}
- */
-
-function isOverBudget(lhr) {
-  const perfBudget = lhr.audits['performance-budget']
-  if (!perfBudget.details || !perfBudget.details.items) return false
-  return perfBudget.details.items.some(/** @param {object} item */ item => item.sizeOverBudget)
 }
