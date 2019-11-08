@@ -4,8 +4,7 @@
 
 > Run Lighthouse in CI using Github Actions.
 
-<!-- TODO(exterkamp): update this screenshot to LHCI -->
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/158189/65678706-1a063580-e054-11e9-95dc-a1a9fe13bc6b.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516729-abfb8380-0239-11ea-8972-d2d5d4a5f3fb.png">
 
 Audit URLs using [Lighthouse](https://developers.google.com/web/tools/lighthouse),
 and monitor performance with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci).
@@ -104,8 +103,8 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
   }
 ]
 ```
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516802-ec5b0180-0239-11ea-9c58-d65487494301.png">
 
-<!-- TODO(exterkamp): screenshot of this passing and failing a build. -->
 
 ### Asserting Against LHCI assertions.json
 
