@@ -1,44 +1,49 @@
 const core = require('@actions/core')
 const childProcess = require('child_process')
 const lhciCliPath = require.resolve('@lhci/cli/src/cli.js')
-const { join } = require('path')
-const { writeFile } = require('fs').promises
 const { readFileSync } = require('fs')
 
 // audit urls with Lighthouse CI
 async function main() {
   const urls = getUrls()
   const numberOfRuns = getRuns()
+
+  /** @type {string[]} */
+  const failedUrls = []
+
   core.startGroup(`Running ci on: ${urls}`)
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
     // Collect!
     core.startGroup(`Collecting`)
-    let args = [`--url=${url}`, `--numberOfRuns=${numberOfRuns}`]
-    // TODO(exterkamp): rc-file override for custom-config and Chrome Flags
+    let args = [`--url=${url}`]
+
+    if (rcHasCollect()) {
+      args.push(`--rc-file=${getRcFile()}`)
+    } else {
+      args.push(`--numberOfRuns=${numberOfRuns}`)
+    }
 
     let status = await runChildCommand('collect', args).status
-
     if (status !== 0) continue
     core.endGroup()
 
     // Assert!
-    // TODO(exterkamp): assert against budget and assertion matrix
-    if (getBudgetPath()/* TODO(exterkamp): or assertion matrix */) {
+    if (getBudgetPath() || rcHasAssert()) {
       core.startGroup(`Asserting`)
 
       args = []
 
       if (getBudgetPath()) {
         args.push(`--budgetsFile=${getBudgetPath()}`)
+      } else {
+        args.push(`--rc-file=${getRcFile()}`)
       }
-      // else assertion matrix
-      // else die
 
       status = await runChildCommand('assert', args).status
 
       if (status !== 0) {
-        // TODO(exterkamp): fail the build
+        failedUrls.push(url)
         continue
       }
       core.endGroup()
@@ -60,6 +65,16 @@ async function main() {
     core.endGroup()
     core.endGroup()
   }
+
+  // fail last
+  // TODO(exterkamp): use rich failure text from assertion results
+  if (failedUrls.length) {
+    core.setFailed(
+      `Performance budget fails for ${failedUrls.length} URL${failedUrls.length === 1 ? '' : 's'}` +
+        ` (${failedUrls.join(', ')})`
+    )
+  }
+
   // TODO(exterkamp): cool to save all LHRs from a run as artifacts in gh-actions?
   // core.setOutput('resultsPath', '.lighthouseci')
   core.endGroup()
@@ -106,11 +121,33 @@ function getUrls() {
   return urls.split('\n').map(url => url.trim())
 }
 
-/** @return {object | null} */
+/** @return {string | null} */
 function getBudgetPath() {
-  const budgetPath = core.getInput('budgetPath')
+  const budgetPath = core.getInput('budget_path')
   if (!budgetPath) return null
   return budgetPath
+}
+
+/** @return {object | null} */
+function getRcFile() {
+  return core.getInput('rc_file') || null
+}
+
+function rcHasAssert() {
+  if (!getRcFile()) return false
+  const contents = readFileSync(getRcFile(), 'utf8');
+  const rcFile = JSON.parse(contents);
+  if ('ci' in rcFile && 'assert' in rcFile.ci) return true
+  return false
+}
+
+function rcHasCollect() {
+  if (!getRcFile()) return false
+  const contents = readFileSync(getRcFile(), 'utf8');
+  // TODO(exterkamp): doing this to see if it has "collect" seems dumb
+  const rcFile = JSON.parse(contents);
+  if ('ci' in rcFile && 'collect' in rcFile.ci) return true
+  return false
 }
 
 /**
