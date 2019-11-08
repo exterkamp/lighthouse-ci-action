@@ -4,7 +4,12 @@ const core = require('@actions/core')
 const collectCmd = require('@lhci/cli/src/collect/collect.js')
 // @ts-ignore
 const uploadCmd = require('@lhci/cli/src/upload/upload.js')
+// @ts-ignore
+const assertCmd = require('@lhci/cli/src/assert/assert.js')
 const { join } = require('path')
+const childProcess = require('child_process');
+
+const lhciCliPath = require.resolve('@lhci/cli/src/cli.js');
 
 // audit urls with Lighthouse CI
 async function main() {
@@ -34,18 +39,42 @@ async function main() {
   console.log('ci settings: %s', JSON.stringify(ciSettings, null, '  '))
   core.endGroup()
 
+
+
+  childProcess.spawnSync(process.argv[0], ['-e', 'console.error("HELLLLOO")'], {
+    // process.argv[0],
+    stdio: 'inherit'});
+    //combinedArgs});
+  process.stdout.write('\n');
+  process.exit(0);
+
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
     // Collect
-    await collectCmd.runCommand({
-      numberOfRuns,
-      url,
-      method: 'node',
-      // additive: 'true',
-      settings: ciSettings
-    })
-    // Assert!
-    // TODO(exterkamp): assertCmd
+    // const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
+    const args = ['']
+    const combinedArgs = [lhciCliPath, 'collect', ...args];
+    console.log({combinedArgs})
+    
+    const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs, {
+      // process.argv[0],
+      stdio: 'inherit'});
+      //combinedArgs});
+    process.stdout.write('\n');
+    if (status !== 0) continue
+
+
+    // await collectCmd.runCommand({
+    //   numberOfRuns,
+    //   url,
+    //   method: 'node',
+    //   // additive: 'true',
+    //   settings: ciSettings
+    // })
+    // // Assert!
+    // // TODO(exterkamp): assertCmd
+    // // Assert against a budget
+    // await assertCmd.runCommand({budgetsFile: getBudgets()})
 
     // Upload!
     core.startGroup(`Uploading LHRs`)
@@ -62,6 +91,7 @@ async function main() {
           's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig' // replace UUIDs
         ]
       }
+    // else artifacts?
     } else {
       uploadSettings = { target: 'temporary-public-storage' }
     }
@@ -149,6 +179,13 @@ function getOnlyCategories() {
   const onlyCategories = core.getInput('onlyCategories')
   if (!onlyCategories) return null
   return onlyCategories.split(',').map(category => category.trim())
+}
+
+/** @return {string | null} */
+function getBudgets() {
+  const budgetPath = core.getInput('budgetPath')
+  if (!budgetPath) return null
+  return budgetPath
 }
 
 /** @return {object | null} */
