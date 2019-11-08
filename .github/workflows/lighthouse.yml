@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Assert on a assertions from rc-file
+      - name: Assert on assertions from rc-file
         uses: ./
         with:
           urls: 'https://alekseykulikov.com/'

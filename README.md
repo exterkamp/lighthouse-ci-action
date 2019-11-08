@@ -103,6 +103,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
   }
 ]
 ```
+
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516802-ec5b0180-0239-11ea-9c58-d65487494301.png">
 
 
@@ -146,7 +147,7 @@ Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/Googl
 }
 ```
 
-<!-- TODO(exterkamp): screenshot of this passing and failing a build. -->
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516967-74d9a200-023a-11ea-961c-fb4c05513661.png">
 
 ### Uploading to a LHCI Server
 
