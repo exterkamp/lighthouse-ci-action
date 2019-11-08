@@ -11,7 +11,7 @@ jobs:
           lhci_server: ${{ secrets.LHCI_SERVER }}
           api_token: ${{ secrets.LHCI_API_TOKEN }}
           url: 'https://exterkamp.codes/'
-          runs: 1
+          runs: 10
       - name: Save artifacts
         uses: actions/upload-artifact@v1
         with:
