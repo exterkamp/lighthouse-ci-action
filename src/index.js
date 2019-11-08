@@ -115,8 +115,6 @@ function runChildCommand(command, args = []) {
  */
 
 function getUrls() {
-  const url = core.getInput('url')
-  if (url) return [url]
   const urls = core.getInput('urls')
   return urls.split('\n').map(url => url.trim())
 }
@@ -130,7 +128,7 @@ function getBudgetPath() {
 
 /** @return {object | null} */
 function getRcFile() {
-  return core.getInput('rc_file') || null
+  return core.getInput('rc_file_path') || null
 }
 
 function rcHasAssert() {
@@ -153,12 +151,11 @@ function rcHasCollect() {
 /**
  * Get the number of runs.
  *
- * @return {number | null}
+ * @return {number}
  */
 
 function getRuns() {
-  // Get num of runs || LHCI default of 3
-  const numberOfRuns = parseInt(core.getInput('runs') || '3')
+  const numberOfRuns = parseInt(core.getInput('runs'))
   return numberOfRuns
 }
 

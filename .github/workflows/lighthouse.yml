@@ -10,8 +10,7 @@ jobs:
         with:
           lhci_server: ${{ secrets.LHCI_SERVER }}
           api_token: ${{ secrets.LHCI_API_TOKEN }}
-          url: 'https://exterkamp.codes/'
-          runs: 10
+          urls: 'https://exterkamp.codes/'
       - name: Save artifacts
         uses: actions/upload-artifact@v1
         with:
@@ -36,18 +35,18 @@ jobs:
       - name: Assert on a budget
         uses: ./
         with:
-          url: 'https://exterkamp.codes/'
+          urls: 'https://exterkamp.codes/'
           budget_path: '.github/lighthouse/budget.json'
           runs: 1
       - name: Assert on a assertions from rc-file
         uses: ./
         with:
-          url: 'https://exterkamp.codes/'
-          rc_file: '.github/lighthouse/rc_file_assertions_only.json'
+          urls: 'https://exterkamp.codes/'
+          rc_file_path: '.github/lighthouse/rc_file_assertions_only.json'
           runs: 1
       - name: Use rc-file for Chrome flags and config
         uses: ./
         with:
-          url: 'https://exterkamp.codes/'
-          rc_file: '.github/lighthouse/rc_file_collection_only.json'
+          urls: 'https://exterkamp.codes/'
+          rc_file_path: '.github/lighthouse/rc_file_collection_only.json'
           runs: 1
