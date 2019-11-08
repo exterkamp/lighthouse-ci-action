@@ -43,6 +43,8 @@ jobs:
         with:
           urls: 'https://example.com/'
           runs: 1
+      # Note: Lighthouse-ci-actions overwrite .lighthouseci/ each run, therefore
+      # artifacts need to be saved after each run if using gh-actions artifacts.
       - name: Save results
         uses: actions/upload-artifact@v1
         with:
@@ -51,9 +53,8 @@ jobs:
 ```
 
 > Note: By default this action will also store the reports to LHCI
-> `temporary-public-storage` when a `lhci_server` is not specified.
-
-TODO(exterkamp): Opt out of temporary-public-storage.
+> `temporary-public-storage` when a `lhci_server` is not specified, in order to
+> opt out, send the `no_upload` parameter.
 
 ### Asserting Against Performance budgets.json
 

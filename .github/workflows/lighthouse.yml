@@ -1,6 +1,20 @@
 name: Run action locally
 on: push
 jobs:
+  hermetic-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run hermetic Lighthouse action
+        uses: ./
+        with:
+          urls: 'https://exterkamp.codes/'
+          no_upload: true
+      - name: Save artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: hermetic-artifacts
+          path: '.lighthouseci'
   populate-ci-server-data:
     runs-on: ubuntu-latest
     steps:

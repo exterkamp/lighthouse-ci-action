@@ -5,9 +5,9 @@ const { readFileSync } = require('fs')
 
 // audit urls with Lighthouse CI
 async function main() {
-  // TODO(exterkamp): fail if !(url || urls) || !(hasCollect || numberOfRuns)
+  // TODO(exterkamp): fail if !(hasCollect || numberOfRuns)
   const urls = getUrls()
-  const numberOfRuns = getRuns()
+  const numberOfRuns = getNumberOfRuns()
 
   /** @type {string[]} */
   const failedUrls = []
@@ -21,7 +21,7 @@ async function main() {
 
     if (rcHasCollect()) {
       args.push(`--rc-file=${getRcFile()}`)
-    } else {
+    } else if (!!numberOfRuns) {
       args.push(`--numberOfRuns=${numberOfRuns}`)
     }
 
@@ -50,19 +50,22 @@ async function main() {
     }
 
     // Upload!
-    core.startGroup(`Uploading`)
-    args = []
+    if (getLhciServer() || !getNoUpload()) {
+      core.startGroup(`Uploading`)
+      args = []
 
-    if (getLhciServer()) {
-      args.push('--target=lhci', `--serverBaseUrl=${getLhciServer()}`, `--token=${getApiToken()}`)
-    } else {
-      args.push('--target=temporary-public-storage')
+      if (getLhciServer()) {
+        args.push('--target=lhci', `--serverBaseUrl=${getLhciServer()}`, `--token=${getApiToken()}`)
+      } else {
+        args.push('--target=temporary-public-storage')
+      }
+
+      status = await runChildCommand('upload', args).status
+
+      if (status !== 0) continue
+      core.endGroup()
     }
 
-    status = await runChildCommand('upload', args).status
-
-    if (status !== 0) continue
-    core.endGroup()
     core.endGroup()
   }
 
@@ -74,9 +77,6 @@ async function main() {
         ` (${failedUrls.join(', ')})`
     )
   }
-
-  // TODO(exterkamp): cool to save all LHRs from a run as artifacts in gh-actions?
-  // core.setOutput('resultsPath', '.lighthouseci')
   core.endGroup()
 }
 
@@ -154,7 +154,7 @@ function rcHasCollect() {
  * @return {number}
  */
 
-function getRuns() {
+function getNumberOfRuns() {
   const numberOfRuns = parseInt(core.getInput('runs'))
   return numberOfRuns
 }
@@ -179,4 +179,15 @@ function getApiToken() {
   const token = core.getInput('api_token')
   if (!token) return null
   return token
+}
+
+/**
+ * Check if the run has opted out of uploading data.
+ *
+ * @return {boolean}
+ */
+function getNoUpload() {
+  const noUpload = core.getInput('no_upload')
+  if (!!noUpload) return true
+  return false
 }
