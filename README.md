@@ -202,7 +202,6 @@ Chrome flags can be set directly in the `rc-file`'s `collect` section.
     "collect": {
       "numberOfRuns": 1,
       "settings": {
-        // Chrome flags as a list of strings
         "chromeFlags": ["--disable-gpu", "--no-sandbox", "--no-zygote"],
       }
     }
@@ -212,7 +211,7 @@ Chrome flags can be set directly in the `rc-file`'s `collect` section.
 
 Custom Lighthouse config can be defined in a seperate Lighthouse config using
 the [custom Lighthouse config syntax](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md).
-This is then referenced by the `rc_file` in the 
+This is then referenced by the `rc_file` in the `configPath`.
 
 #### rc_file.json
 ```json
@@ -221,13 +220,14 @@ This is then referenced by the `rc_file` in the
     "collect": {
       "numberOfRuns": 1,
       "settings": {
-        // Chrome flags as a list of strings
         "configPath": "./lighthouse-config.js",
       }
     }
   }
 }
 ```
+
+Then put all the custom Lighthouse config in the file referenced in the `rc_file`.
 
 #### lighthouse-config.js
 ```javascript
