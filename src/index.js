@@ -19,7 +19,7 @@ async function main() {
 
     if (rcHasCommand('collect')) {
       args.push(`--rc-file=${getRcFile()}`)
-    // This should only happen in local testing, when the default is not sent
+      // This should only happen in local testing, when the default is not sent
     } else if (!!numberOfRuns) {
       args.push(`--numberOfRuns=${numberOfRuns}`)
     }
@@ -98,7 +98,7 @@ main()
 
 /**
  * Run a child command synchronously.
- * 
+ *
  * @param {'collect'|'assert'|'upload'} command
  * @param {string[]} [args]
  * @return {{status: number}}
@@ -124,9 +124,9 @@ function getUrls() {
   return urls.split('\n').map(url => url.trim())
 }
 
-/** 
+/**
  * Get the path to a budgets.json file.
- * 
+ *
  * @return {string | null}
  */
 function getBudgetPath() {
@@ -138,7 +138,7 @@ function getBudgetPath() {
 /**
  * Get the path to a rc_file.json file.
  *
- * @return {object | null} 
+ * @return {object | null}
  */
 function getRcFile() {
   return core.getInput('rc_file_path') || null
@@ -157,7 +157,6 @@ function rcHasCommand(command) {
   if ('ci' in rcFile && command in rcFile.ci) return true
   return false
 }
-
 
 /**
  * Get the number of runs.

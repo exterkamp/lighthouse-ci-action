@@ -327,5 +327,6 @@ no_upload: 'any value'
 Sponsored by [Treo.sh - Page speed monitoring made easy](https://treo.sh) and [Google](https://google.com/).
 
 <!-- TODO(exterkamp): change back to main on PR -->
+
 [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
