@@ -20,6 +20,7 @@ jobs:
   hermetic-advanced:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: Use rc-file for Chrome flags and config
         uses: ./
         with:
@@ -49,6 +50,7 @@ jobs:
   assert-on-budget:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: Assert on a budget
         uses: ./
         with:
@@ -59,6 +61,7 @@ jobs:
   assert-on-rc-file:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: Assert on a assertions from rc-file
         uses: ./
         with:
