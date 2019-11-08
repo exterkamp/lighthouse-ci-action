@@ -44,7 +44,6 @@ async function main() {
 
       if (status !== 0) {
         failedUrls.push(url)
-        continue
       }
       core.endGroup()
     }
