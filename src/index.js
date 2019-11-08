@@ -24,20 +24,25 @@ async function main() {
 
     // Assert!
     // TODO(exterkamp): assert against budget and assertion matrix
-    core.startGroup(`Asserting`)
-    args = []
+    if (getBudgetPath()/* TODO(exterkamp): or assertion matrix */) {
+      core.startGroup(`Asserting`)
 
-    if (getBudgetPath()) {
-      args.push(`--budgetsFile=${getBudgetPath()}`)
+      args = []
+
+      if (getBudgetPath()) {
+        args.push(`--budgetsFile=${getBudgetPath()}`)
+      }
+      // else assertion matrix
+      // else die
+
+      status = await runChildCommand('assert', args).status
+
+      if (status !== 0) {
+        // TODO(exterkamp): fail the build
+        continue
+      }
+      core.endGroup()
     }
-
-    status = await runChildCommand('assert', args).status
-
-    if (status !== 0) {
-      // TODO(exterkamp): fail the build
-      continue
-    }
-    core.endGroup()
 
     // Upload!
     core.startGroup(`Uploading`)
