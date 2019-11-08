@@ -1,10 +1,11 @@
 # Lighthouse CI Action
 
-TODO(exterkamp): rename `<<NAME@v1>>` to the action name
+<!-- TODO(exterkamp): rename `<<NAME@v1>>` to the action name -->
 
 > Run Lighthouse in CI using Github Actions.
 
-<!-- <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/158189/65678706-1a063580-e054-11e9-95dc-a1a9fe13bc6b.png"> -->
+<!-- TODO(exterkamp): update this screenshot to LHCI -->
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/158189/65678706-1a063580-e054-11e9-95dc-a1a9fe13bc6b.png">
 
 Audit URLs using [Lighthouse](https://developers.google.com/web/tools/lighthouse),
 and monitor performance with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci).
@@ -104,7 +105,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 ]
 ```
 
-TODO(exterkamp): screenshot of this passing and failing a build.
+<!-- TODO(exterkamp): screenshot of this passing and failing a build. -->
 
 ### Asserting Against LHCI assertions.json
 
@@ -146,7 +147,7 @@ Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/Googl
 }
 ```
 
-TODO(exterkamp): screenshot of this passing and failing a build.
+<!-- TODO(exterkamp): screenshot of this passing and failing a build. -->
 
 ### Uploading to a LHCI Server
 
@@ -176,7 +177,7 @@ jobs:
           runs: 1
 ```
 
-TODO(exterkamp): screenshot of this uploading a LHR to a LHCI server.
+<!-- TODO(exterkamp): screenshot of this uploading a LHR to a LHCI server. -->
 
 ### Using Custom Config & Chrome Flags
 
@@ -273,36 +274,22 @@ Use a performance budget to keep your page size in check. `Lighthouse CI Action`
 Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.json) and [practical use of performance budgets](https://web.dev/use-lighthouse-for-performance-budgets).
 
 ```yml
-budgetPath: .github/lighthouse/budget.json
+budget_path: .github/lighthouse/budget.json
 ```
 
 ### `rc_file_path`
 
-<!-- TODO(exterkamp): change ro LHCI rc-file -->
+Set a path to a custom [LHCI rc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for a full control of the Lighthouse enviroment.
 
-Set a path to a custom [Lighthouse config](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md) for a full control of Lighthouse enviroment.
+This `rc_file` can be used to contorl the collection of data (via Lighthouse config, and
+Chrome Flags), and CI assertions (via LHCI assertions).
+
+> Note: `rc_files` normally also control the "upload" step. However, this method
+> is incompatible with github secrets and would expose all LHCI server addresses
+> and tokens; use `lhci_server` and `api_token` parameters instead.
 
 ```yml
-configPath: ./desktop-config.js
-```
-
-`desktop-config.js`:
-
-```js
-module.exports = {
-  extends: 'lighthouse:default',
-  settings: {
-    emulatedFormFactor: 'desktop',
-    throttling: { rttMs: 40, throughputKbps: 10240, cpuSlowdownMultiplier: 1 },
-    audits: [
-      { path: 'metrics/first-contentful-paint', options: { scorePODR: 800, scoreMedian: 1600 } },
-      { path: 'metrics/first-meaningful-paint', options: { scorePODR: 800, scoreMedian: 1600 } },
-      { path: 'metrics/speed-index', options: { scorePODR: 1100, scoreMedian: 2300 } },
-      { path: 'metrics/interactive', options: { scorePODR: 2000, scoreMedian: 4500 } },
-      { path: 'metrics/first-cpu-idle', options: { scorePODR: 2000, scoreMedian: 4500 } }
-    ]
-  }
-}
+rc_file_path: ./rc_file.json
 ```
 
 ### `lhci_server`
