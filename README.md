@@ -1,25 +1,33 @@
 # Lighthouse CI Action
+TODO(exterkamp): rename `<<NAME@v1>>` to the action name
 
 > Run Lighthouse in CI using Github Actions.
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/158189/65678706-1a063580-e054-11e9-95dc-a1a9fe13bc6b.png">
+<!-- <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/158189/65678706-1a063580-e054-11e9-95dc-a1a9fe13bc6b.png"> -->
 
-Audit many URLs using [Lighthouse](https://developers.google.com/web/tools/lighthouse),
-and test performance budget as a part of your CI pipeline. This [Github Action](https://github.com/features/actions) makes running Lighthouse in CI easy, free, and without dependencies.
+Audit URLs using [Lighthouse](https://developers.google.com/web/tools/lighthouse),
+and monitor performance with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci).
 
 **Features**:
 
 - ✅ Audit URLs using Lighthouse
-- 🎯 Test performance budget as a part of the build
+- 🎯 Test performance with LHCI assertions
+- 💵 Test performance with Lighthouse budgets
 - ⚙️ Full control over Lighthouse config
 - 🔍 Detailed output for quick debug
-- 🚀 Fast (less than 3 seconds) action initialization
+- 💾 Upload data to LHCI server
+- 🚀 Fast action initialization
 
 ## Usage
+
+### Basic Action
+
+> Use Case: Run Lighthouse on each push to the repo and save the results in action artifacts.
 
 Create `.github/workflows/main.yml` with the list of URLs to audit using lighthouse.
 The results will be stored as a build artifact.
 
+#### main.yml
 ```yml
 name: Lighthouse Audit
 on: push
@@ -28,25 +36,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Audit URLs using Lighthouse and ensure performance budget
-        uses: treosh/lighthouse-ci-action@v1
+      - name: Audit URLs using Lighthouse
+        uses: <<NAME@v1>>
         with:
-          urls: |
-            https://example.com/
-            https://example.com/blog
-            https://example.com/pricing
-          budgetPath: ./budget.json
+          urls: 'https://example.com/'
+          runs: 1
       - name: Save results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v1
         with:
           name: lighthouse-results
-          path: './results'
+          path: '.lighthouseci'
 ```
 
-Set `budgetPath` if you need to ensure [performance budget](https://web.dev/use-lighthouse-for-performance-budgets) as a part of CI process.
+> Note: By default this action will also store the reports to LHCI
+`temporary-public-storage` when a `lhci_server` is not specified.
 
-`budget.json`
+TODO(exterkamp): Opt out of temporary-public-storage.
 
+### Asserting Against Performance budgets.json
+
+> Use Case: Run Lighthouse and validate against a budget.
+
+Create `.github/workflows/main.yml` with the list of URLs to audit
+and identify a budget with `budget_path`.
+
+#### main.yml
+```yml
+name: Lighthouse Audit
+on: push
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Audit URLs and Assert
+        uses: <<NAME@v1>>
+        with:
+          urls: 'https://example.com/'
+          budget_path: './budgets.json'
+```
+
+Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-for-performance-budgets/).
+
+> Note: Under the hood, this will be transformed into LHCI assertions.
+
+#### budgets.json
 ```json
 [
   {
@@ -65,50 +99,148 @@ Set `budgetPath` if you need to ensure [performance budget](https://web.dev/use-
 ]
 ```
 
-In a more realistic case, first, you would need to run tests and deploy the project on staging. Than run Lighthouse audits on the live URLs to ensure the budget and collect artifacts. The `.github/workflows/main.yml` config may look like this:
+TODO(exterkamp): screenshot of this passing and failing a build.
 
+### Asserting Against LHCI assertions.json
+
+> Use Case: Run Lighthouse and validate against LHCI assertions.
+
+Create `.github/workflows/main.yml` with the list of URLs to audit
+and identify a `rc_file` with `rc_file_path`.
+
+#### main.yml
 ```yml
-name: CI
+name: Lighthouse Audit
 on: push
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Use node 10
-        uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-      - name: Install and test
-        run: |
-          npm install
-          npm test
-      - name: Deploy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: npm run deploy
   lighthouse:
     runs-on: ubuntu-latest
-    needs: build
     steps:
-      - uses: actions/checkout@master
-      - name: Run Lighthouse and test budgets
-        uses: treosh/lighthouse-ci-action@v1
+      - uses: actions/checkout@v1
+      - name: Audit URLs and Assert
+        uses: <<NAME@v1>>
         with:
-          urls: |
-            https://example.com/
-            https://example.com/features
-            https://example.com/blog
-          budgetPath: ./budget.json
-      - name: Upload artifacts
-        uses: actions/upload-artifact@master
-        with:
-          name: lighthouse-results
-          path: './results'
+          urls: 'https://example.com/'
+          rc_file_path: './rc_file.json'
 ```
 
-<img width="762" alt="Successful Build" src="https://user-images.githubusercontent.com/158189/65687641-fea62500-e069-11e9-946b-4d6d5085a3e6.png">
+Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/assertions.md).
+
+#### rc_file.json
+```json
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "first-contentful-paint": ["error", {"minScore": 0.8}],
+      }
+    }
+  }
+}
+```
+
+TODO(exterkamp): screenshot of this passing and failing a build.
+
+### Uploading to a LHCI Server
+
+> Use Case: Providing data to a hosted LHCI server.
+
+Create `.github/workflows/main.yml` with the list of URLs to audit using lighthouse,
+and identify a `lhci_server` to upload to and an `api_token` to use.
+
+Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+
+#### main.yml
+```yml
+name: Lighthouse Audit
+on: push
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Audit URLs using Lighthouse
+        uses: <<NAME@v1>>
+        with:
+          urls: 'https://example.com/'
+          lhci_server: ${{ secrets.LHCI_SERVER }}
+          api_token: ${{ secrets.LHCI_API_TOKEN }}
+          runs: 1
+```
+
+TODO(exterkamp): screenshot of this uploading a LHR to a LHCI server.
+
+### Using Custom Config & Chrome Flags
+
+> Use Case: Running Lighthouse with highly custom Lighthouse runtime or custom Chrome flags.
+
+Create `.github/workflows/main.yml` with the list of URLs to audit and
+identify a `rc_file` with `rc_file_path`.
+
+#### main.yml
+```yml
+name: Lighthouse Audit
+on: push
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Audit URLs and Assert
+        uses: <<NAME@v1>>
+        with:
+          urls: 'https://example.com/'
+          rc_file_path: './rc_file.json'
+```
+
+Chrome flags can be set directly in the `rc-file`'s `collect` section.
+
+#### rc_file.json
+```json
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1,
+      "settings": {
+        // Chrome flags as a list of strings
+        "chromeFlags": ["--disable-gpu", "--no-sandbox", "--no-zygote"],
+      }
+    }
+  }
+}
+```
+
+Custom Lighthouse config can be defined in a seperate Lighthouse config using
+the [custom Lighthouse config syntax](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md).
+This is then referenced by the `rc_file` in the 
+
+#### rc_file.json
+```json
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1,
+      "settings": {
+        // Chrome flags as a list of strings
+        "configPath": "./lighthouse-config.js",
+      }
+    }
+  }
+}
+```
+
+#### lighthouse-config.js
+```javascript
+module.exports = {
+  extends: 'lighthouse:default',
+  settings: {
+    emulatedFormFactor: 'desktop',
+    audits: [
+      { path: 'metrics/first-contentful-paint', options: { scorePODR: 800, scoreMedian: 1600 } },
+    ]
+  }
+}
+```
 
 ## Inputs
 
@@ -130,7 +262,7 @@ If you need to audit just one URL, use the `url` option:
 url: https://example.com/
 ```
 
-### `budgetPath`
+### `budget_path`
 
 Use a performance budget to keep your page size in check. `Lighthouse CI Action` will fail the build if one of the URLs exceed the budget.
 
@@ -140,7 +272,9 @@ Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.j
 budgetPath: .github/lighthouse/budget.json
 ```
 
-### `configPath`
+### `rc_file_path`
+
+<!-- TODO(exterkamp): change ro LHCI rc-file -->
 
 Set a path to a custom [Lighthouse config](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md) for a full control of Lighthouse enviroment.
 
@@ -167,46 +301,31 @@ module.exports = {
 }
 ```
 
-### `throttlingMethod`
+### `lhci_server`
 
-Set `devtools`, `simulate`, or `provided` to configure throttling.
+Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to.
+
+Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 ```yml
-throttlingMethod: devtools
+lhci_server: ${{ secrets.LHCI_SERVER }}
 ```
 
-### `onlyCategories`
+### `api_token`
 
-Specify Lighthouse categories to limit the results output and run audits faster.
+Specify an API token for the LHCI server.
 
-```yml
-onlyCategories: [performance]
-```
-
-### `chromeFlags`
-
-Use `chromeFlags` to pass any argument to Chrome.
-`Lighthouse CI Action` uses a built-in Chrome instance that comes with an image specified with `runs-on` option.
-
-[Learn more about useful Chrome flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md).
+Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 ```yml
-chromeFlags: '--window-size=1200,800 --single-process'
-```
-
-### `extraHeaders`
-
-Pass any HTTP header to the Chrome so you can audit authenticate pages or disable/enable a certain behavior.
-
-```yml
-extraHeaders '{"Cookie":"monster=blue","x-men":"wolverine"}'
+api_token: ${{ secrets.LHCI_API_TOKEN }}
 ```
 
 ---
 
 ## Credits
 
-Sponsored by [Treo.sh - Page speed monitoring made easy](https://treo.sh).
+Forked from an action by [Treo.sh - Page speed monitoring made easy](https://treo.sh).
 
 [![](https://github.com/treosh/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
