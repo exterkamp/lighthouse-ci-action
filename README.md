@@ -312,11 +312,20 @@ Note: use [Github secrets](https://help.github.com/en/actions/automating-your-wo
 api_token: ${{ secrets.LHCI_API_TOKEN }}
 ```
 
+### `no_upload`
+
+This will opt-out of the default upload to `temporary-public-storage`.
+
+```yml
+no_upload: 'any value'
+```
+
 ---
 
 ## Credits
 
-Forked from an action by [Treo.sh - Page speed monitoring made easy](https://treo.sh).
+Sponsored by [Treo.sh - Page speed monitoring made easy](https://treo.sh) and [Google](https://google.com/).
 
+<!-- TODO(exterkamp): change back to main on PR -->
 [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)

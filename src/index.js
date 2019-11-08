@@ -5,7 +5,6 @@ const { readFileSync } = require('fs')
 
 // audit urls with Lighthouse CI
 async function main() {
-  // TODO(exterkamp): fail if !(hasCollect || numberOfRuns)
   const urls = getUrls()
   const numberOfRuns = getNumberOfRuns()
 
@@ -15,24 +14,26 @@ async function main() {
   core.startGroup(`Running ci on: ${urls}`)
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
-    // Collect!
     core.startGroup(`Collecting`)
     let args = [`--url=${url}`]
 
-    if (rcHasCollect()) {
+    if (rcHasCommand('collect')) {
       args.push(`--rc-file=${getRcFile()}`)
+    // This should only happen in local testing, when the default is not sent
     } else if (!!numberOfRuns) {
       args.push(`--numberOfRuns=${numberOfRuns}`)
     }
+    // else, no args will default to 3 in LHCI.
 
     let status = await runChildCommand('collect', args).status
-    if (status !== 0) continue
+    if (status !== 0) {
+      core.error(`LHCI 'collect' has encountered a problem.`)
+      continue
+    }
     core.endGroup()
 
-    // Assert!
-    if (getBudgetPath() || rcHasAssert()) {
+    if (getBudgetPath() || rcHasCommand('assert')) {
       core.startGroup(`Asserting`)
-
       args = []
 
       if (getBudgetPath()) {
@@ -49,8 +50,7 @@ async function main() {
       core.endGroup()
     }
 
-    // Upload!
-    if (getLhciServer() || !getNoUpload()) {
+    if (getLhciServer() || canUpload()) {
       core.startGroup(`Uploading`)
       args = []
 
@@ -62,16 +62,19 @@ async function main() {
 
       status = await runChildCommand('upload', args).status
 
-      if (status !== 0) continue
+      if (status !== 0) {
+        core.error(`LHCI 'upload' has encountered a problem.`)
+        continue
+      }
       core.endGroup()
     }
-
     core.endGroup()
   }
 
   // fail last
   // TODO(exterkamp): use rich failure text from assertion results
   if (failedUrls.length) {
+    // TODO(exterkamp): use ICU
     core.setFailed(
       `Performance budget fails for ${failedUrls.length} URL${failedUrls.length === 1 ? '' : 's'}` +
         ` (${failedUrls.join(', ')})`
@@ -94,6 +97,8 @@ main()
   })
 
 /**
+ * Run a child command synchronously.
+ * 
  * @param {'collect'|'assert'|'upload'} command
  * @param {string[]} [args]
  * @return {{status: number}}
@@ -109,7 +114,7 @@ function runChildCommand(command, args = []) {
 }
 
 /**
- * Get urls from `url` or `urls`.
+ * Get urls from `urls`.
  *
  * @return {string[]}
  */
@@ -119,37 +124,44 @@ function getUrls() {
   return urls.split('\n').map(url => url.trim())
 }
 
-/** @return {string | null} */
+/** 
+ * Get the path to a budgets.json file.
+ * 
+ * @return {string | null}
+ */
 function getBudgetPath() {
   const budgetPath = core.getInput('budget_path')
   if (!budgetPath) return null
   return budgetPath
 }
 
-/** @return {object | null} */
+/**
+ * Get the path to a rc_file.json file.
+ *
+ * @return {object | null} 
+ */
 function getRcFile() {
   return core.getInput('rc_file_path') || null
 }
 
-function rcHasAssert() {
+/**
+ * Check if an rc_file exists, and if it contains a command section.
+ *
+ * @param {'collect'|'assert'} command
+ * @return {boolean}
+ */
+function rcHasCommand(command) {
   if (!getRcFile()) return false
   const contents = readFileSync(getRcFile(), 'utf8')
   const rcFile = JSON.parse(contents)
-  if ('ci' in rcFile && 'assert' in rcFile.ci) return true
+  if ('ci' in rcFile && command in rcFile.ci) return true
   return false
 }
 
-function rcHasCollect() {
-  if (!getRcFile()) return false
-  const contents = readFileSync(getRcFile(), 'utf8')
-  // TODO(exterkamp): doing this to see if it has "collect" seems dumb
-  const rcFile = JSON.parse(contents)
-  if ('ci' in rcFile && 'collect' in rcFile.ci) return true
-  return false
-}
 
 /**
  * Get the number of runs.
+ * Note: github-actions sends a default of 3.
  *
  * @return {number}
  */
@@ -182,12 +194,12 @@ function getApiToken() {
 }
 
 /**
- * Check if the run has opted out of uploading data.
+ * Check if the run can upload, or if the runner has opted out.
  *
  * @return {boolean}
  */
-function getNoUpload() {
+function canUpload() {
   const noUpload = core.getInput('no_upload')
-  if (!!noUpload) return true
-  return false
+  if (!!noUpload) return false
+  return true
 }
