@@ -106,7 +106,6 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516802-ec5b0180-0239-11ea-9c58-d65487494301.png">
 
-
 ### Asserting Against LHCI assertions.json
 
 > Use Case: Run Lighthouse and validate against LHCI assertions.
