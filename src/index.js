@@ -1,104 +1,48 @@
 const { mapKeys } = require('lodash')
 const core = require('@actions/core')
-// @ts-ignore
-const collectCmd = require('@lhci/cli/src/collect/collect.js')
-// @ts-ignore
-const uploadCmd = require('@lhci/cli/src/upload/upload.js')
-// @ts-ignore
-const assertCmd = require('@lhci/cli/src/assert/assert.js')
 const { join } = require('path')
 const childProcess = require('child_process');
-
 const lhciCliPath = require.resolve('@lhci/cli/src/cli.js');
 
 // audit urls with Lighthouse CI
 async function main() {
   const urls = getUrls()
   const numberOfRuns = getRuns()
-  const baseConfig = getConfig()
-  const baseSettings = baseConfig.settings || {}
-  const config = {
-    ...baseConfig,
-    settings: {
-      ...baseSettings,
-      throttlingMethod: core.getInput('throttlingMethod') || baseSettings.throttlingMethod || 'simulate',
-      onlyCategories: getOnlyCategories() || baseSettings.onlyCategories,
-      extraHeaders: getExtraHeaders() || baseSettings.extraHeaders
-    }
-  }
-  const ciSettings = {
-    chromeFlags: getChromeFlags().join(' '),
-    config,
-    settings: {
-      logLevel: 'info'
-    }
-  }
-  core.startGroup('Lighthouse config')
-  console.log('urls: %s', urls)
-  console.log('config: %s', JSON.stringify(config, null, '  '))
-  console.log('ci settings: %s', JSON.stringify(ciSettings, null, '  '))
-  core.endGroup()
-
-
-
-  childProcess.spawnSync(process.argv[0], ['-e', 'console.error("HELLLLOO")'], {
-    // process.argv[0],
-    stdio: 'inherit'});
-    //combinedArgs});
-  process.stdout.write('\n');
-  process.exit(0);
 
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
-    // Collect
-    // const collectStatus = runChildCommand('collect', [...defaultFlags, ...collectArgs]).status;
-    const args = ['']
-    const combinedArgs = [lhciCliPath, 'collect', ...args];
-    console.log({combinedArgs})
-    
-    const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs, {
-      // process.argv[0],
-      stdio: 'inherit'});
-      //combinedArgs});
-    process.stdout.write('\n');
-    if (status !== 0) continue
+    // Collect!
+    core.startGroup(`Collecting`)
+    const collectArgs = [`--url=${url}`,
+                  `--numberOfRuns=${numberOfRuns}`]
+    // TODO(exterkamp): rc-file override for custom-config and Chrome Flags
 
+    let status = await runChildCommand('collect', collectArgs).status;
 
-    // await collectCmd.runCommand({
-    //   numberOfRuns,
-    //   url,
-    //   method: 'node',
-    //   // additive: 'true',
-    //   settings: ciSettings
-    // })
-    // // Assert!
-    // // TODO(exterkamp): assertCmd
-    // // Assert against a budget
-    // await assertCmd.runCommand({budgetsFile: getBudgets()})
-
-    // Upload!
-    core.startGroup(`Uploading LHRs`)
-
-    let uploadSettings = {}
-    if (getLhciServer()) {
-      uploadSettings = {
-        target: 'lhci',
-        serverBaseUrl: getLhciServer(),
-        token: getApiToken(),
-        // TODO(exterkamp): this is a default arg...
-        urlReplacementPatterns: [
-          's#:[0-9]{3,5}/#:PORT/#', // replace ports
-          's/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/UUID/ig' // replace UUIDs
-        ]
-      }
-    // else artifacts?
-    } else {
-      uploadSettings = { target: 'temporary-public-storage' }
-    }
-    await uploadCmd.runCommand(uploadSettings)
+    if (status !== 0) break
+    core.endGroup()
+    // Assert!
+    // TODO(exterkamp): assert against budget and assertion matrix
+    core.startGroup(`Asserting`)
     core.endGroup()
 
-    core.startGroup(`End ci ${url}`)
+    // Upload!
+    core.startGroup(`Uploading`)
+    const uploadArgs = []
+
+    if (getLhciServer()) {
+      uploadArgs.push('--target=lhci',
+          `--serverBaseUrl=${getLhciServer()}`,
+          `--token=${getApiToken()}`);
+    } else {
+      uploadArgs.push('--target=temporary-public-storage');
+    }
+
+    status = await runChildCommand('upload', uploadArgs).status;
+
+    if (status !== 0) break
+    core.endGroup()
+    core.endGroup()
   }
   // TODO(exterkamp): cool to save all LHRs from a run as artifacts in gh-actions?
   // core.setOutput('resultsPath', '.lighthouseci')
@@ -116,6 +60,20 @@ main()
     console.log(`done in ${process.uptime()}s`)
     process.exit()
   })
+
+/**
+ * @param {'collect'|'assert'|'upload'} command
+ * @param {string[]} [args]
+ * @return {{status: number}}
+ */
+function runChildCommand(command, args = []) {
+  const combinedArgs = [lhciCliPath, command, ...args];
+  const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs, {
+    stdio: 'inherit'});
+
+  process.stdout.write('\n');
+  return {status: status || 0};
+}
 
 /**
  * Get urls from `url` or `urls`.
@@ -162,57 +120,4 @@ function getApiToken() {
   const token = core.getInput('api_token')
   if (!token) return null
   return token
-}
-
-/** @return {object} */
-function getConfig() {
-  const configPath = core.getInput('configPath')
-  if (configPath) return require(join(process.cwd(), configPath))
-  return {
-    extends: 'lighthouse:default',
-    settings: {}
-  }
-}
-
-/** @return {string[] | null} */
-function getOnlyCategories() {
-  const onlyCategories = core.getInput('onlyCategories')
-  if (!onlyCategories) return null
-  return onlyCategories.split(',').map(category => category.trim())
-}
-
-/** @return {string | null} */
-function getBudgets() {
-  const budgetPath = core.getInput('budgetPath')
-  if (!budgetPath) return null
-  return budgetPath
-}
-
-/** @return {object | null} */
-function getExtraHeaders() {
-  const extraHeaders = core.getInput('extraHeaders')
-  if (!extraHeaders) return null
-  try {
-    return mapKeys(
-      JSON.parse(extraHeaders || '{}'),
-      /** @param {string} _val @param {string} key */ (_val, key) => key.toLowerCase()
-    )
-  } catch (err) {
-    console.error('Error at parsing extra headers:')
-    console.error(err)
-    return {}
-  }
-}
-
-/**
- * Parse flags: https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
- * @return {string[]}
- */
-
-function getChromeFlags() {
-  // TODO(exterkamp): are these good defaults?
-  const flags = ['--headless', '--disable-gpu', '--no-sandbox', '--no-zygote']
-  const chromeFlags = core.getInput('chromeFlags')
-  if (chromeFlags) flags.push(...chromeFlags.split(' '))
-  return flags
 }
