@@ -10,22 +10,20 @@ jobs:
         with:
           urls: |
             https://exterkamp.codes/
-          extraHeaders: '{"x-github-action":"true"}'
-          runs: 2
+            https://google.com/
+          runs: 1
       - name: Upload to secret-server with secret key
         uses: ./
         with:
           lhci_server: ${{ secrets.LHCI_SERVER }}
           api_token: ${{ secrets.LHCI_API_TOKEN }}
           url: 'https://exterkamp.codes/'
-          chromeFlags: '--window-size=1200,800'
-          configPath: .github/lighthouse/desktop-config.js
-          throttlingMethod: devtools
-          onlyCategories: 'performance'
-          runs: 3
-          extraHeaders: '{"x-github-action":"true"}'
-      - name: Upload artifacts
-        uses: actions/upload-artifact@master
+          runs: 1
+      - name: Assert on a budget
+        uses: ./
         with:
-          name: lighthouse-results
-          path: './.lighthouseci'
+          lhci_server: ${{ secrets.LHCI_SERVER }}
+          api_token: ${{ secrets.LHCI_API_TOKEN }}
+          url: 'https://exterkamp.codes/'
+          budgetPath: '.github/lighthouse/budget.json'
+          runs: 1

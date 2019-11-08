@@ -1,46 +1,63 @@
 const core = require('@actions/core')
 const childProcess = require('child_process')
 const lhciCliPath = require.resolve('@lhci/cli/src/cli.js')
+const { join } = require('path')
+const { writeFile } = require('fs').promises
+const { readFileSync } = require('fs')
 
 // audit urls with Lighthouse CI
 async function main() {
   const urls = getUrls()
   const numberOfRuns = getRuns()
-
+  core.startGroup(`Running ci on: ${urls}`)
   for (const url of urls) {
     core.startGroup(`Start ci ${url}`)
     // Collect!
     core.startGroup(`Collecting`)
-    const collectArgs = [`--url=${url}`, `--numberOfRuns=${numberOfRuns}`]
+    let args = [`--url=${url}`, `--numberOfRuns=${numberOfRuns}`]
     // TODO(exterkamp): rc-file override for custom-config and Chrome Flags
 
-    let status = await runChildCommand('collect', collectArgs).status
+    let status = await runChildCommand('collect', args).status
 
-    if (status !== 0) break
+    if (status !== 0) continue
     core.endGroup()
+
     // Assert!
     // TODO(exterkamp): assert against budget and assertion matrix
     core.startGroup(`Asserting`)
+    args = []
+
+    if (getBudgetPath()) {
+      args.push(`--budgetsFile=${getBudgetPath()}`)
+    }
+
+    status = await runChildCommand('assert', args).status
+
+    if (status !== 0) {
+      // TODO(exterkamp): fail the build
+      continue
+    }
     core.endGroup()
 
     // Upload!
     core.startGroup(`Uploading`)
-    const uploadArgs = []
+    args = []
 
     if (getLhciServer()) {
-      uploadArgs.push('--target=lhci', `--serverBaseUrl=${getLhciServer()}`, `--token=${getApiToken()}`)
+      args.push('--target=lhci', `--serverBaseUrl=${getLhciServer()}`, `--token=${getApiToken()}`)
     } else {
-      uploadArgs.push('--target=temporary-public-storage')
+      args.push('--target=temporary-public-storage')
     }
 
-    status = await runChildCommand('upload', uploadArgs).status
+    status = await runChildCommand('upload', args).status
 
-    if (status !== 0) break
+    if (status !== 0) continue
     core.endGroup()
     core.endGroup()
   }
   // TODO(exterkamp): cool to save all LHRs from a run as artifacts in gh-actions?
   // core.setOutput('resultsPath', '.lighthouseci')
+  core.endGroup()
 }
 
 // run `main()`
@@ -82,6 +99,13 @@ function getUrls() {
   if (url) return [url]
   const urls = core.getInput('urls')
   return urls.split('\n').map(url => url.trim())
+}
+
+/** @return {object | null} */
+function getBudgetPath() {
+  const budgetPath = core.getInput('budgetPath')
+  if (!budgetPath) return null
+  return budgetPath
 }
 
 /**
