@@ -1,4 +1,5 @@
 # Lighthouse CI Action
+
 TODO(exterkamp): rename `<<NAME@v1>>` to the action name
 
 > Run Lighthouse in CI using Github Actions.
@@ -28,6 +29,7 @@ Create `.github/workflows/main.yml` with the list of URLs to audit using lightho
 The results will be stored as a build artifact.
 
 #### main.yml
+
 ```yml
 name: Lighthouse Audit
 on: push
@@ -49,7 +51,7 @@ jobs:
 ```
 
 > Note: By default this action will also store the reports to LHCI
-`temporary-public-storage` when a `lhci_server` is not specified.
+> `temporary-public-storage` when a `lhci_server` is not specified.
 
 TODO(exterkamp): Opt out of temporary-public-storage.
 
@@ -61,6 +63,7 @@ Create `.github/workflows/main.yml` with the list of URLs to audit
 and identify a budget with `budget_path`.
 
 #### main.yml
+
 ```yml
 name: Lighthouse Audit
 on: push
@@ -81,6 +84,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 > Note: Under the hood, this will be transformed into LHCI assertions.
 
 #### budgets.json
+
 ```json
 [
   {
@@ -109,6 +113,7 @@ Create `.github/workflows/main.yml` with the list of URLs to audit
 and identify a `rc_file` with `rc_file_path`.
 
 #### main.yml
+
 ```yml
 name: Lighthouse Audit
 on: push
@@ -127,12 +132,13 @@ jobs:
 Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/assertions.md).
 
 #### rc_file.json
+
 ```json
 {
   "ci": {
     "assert": {
       "assertions": {
-        "first-contentful-paint": ["error", {"minScore": 0.8}],
+        "first-contentful-paint": ["error", { "minScore": 0.8 }]
       }
     }
   }
@@ -151,6 +157,7 @@ and identify a `lhci_server` to upload to and an `api_token` to use.
 Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 #### main.yml
+
 ```yml
 name: Lighthouse Audit
 on: push
@@ -178,6 +185,7 @@ Create `.github/workflows/main.yml` with the list of URLs to audit and
 identify a `rc_file` with `rc_file_path`.
 
 #### main.yml
+
 ```yml
 name: Lighthouse Audit
 on: push
@@ -196,13 +204,14 @@ jobs:
 Chrome flags can be set directly in the `rc-file`'s `collect` section.
 
 #### rc_file.json
+
 ```json
 {
   "ci": {
     "collect": {
       "numberOfRuns": 1,
       "settings": {
-        "chromeFlags": ["--disable-gpu", "--no-sandbox", "--no-zygote"],
+        "chromeFlags": ["--disable-gpu", "--no-sandbox", "--no-zygote"]
       }
     }
   }
@@ -214,13 +223,14 @@ the [custom Lighthouse config syntax](https://github.com/GoogleChrome/lighthouse
 This is then referenced by the `rc_file` in the `configPath`.
 
 #### rc_file.json
+
 ```json
 {
   "ci": {
     "collect": {
       "numberOfRuns": 1,
       "settings": {
-        "configPath": "./lighthouse-config.js",
+        "configPath": "./lighthouse-config.js"
       }
     }
   }
@@ -230,14 +240,13 @@ This is then referenced by the `rc_file` in the `configPath`.
 Then put all the custom Lighthouse config in the file referenced in the `rc_file`.
 
 #### lighthouse-config.js
+
 ```javascript
 module.exports = {
   extends: 'lighthouse:default',
   settings: {
     emulatedFormFactor: 'desktop',
-    audits: [
-      { path: 'metrics/first-contentful-paint', options: { scorePODR: 800, scoreMedian: 1600 } },
-    ]
+    audits: [{ path: 'metrics/first-contentful-paint', options: { scorePODR: 800, scoreMedian: 1600 } }]
   }
 }
 ```
@@ -321,5 +330,5 @@ api_token: ${{ secrets.LHCI_API_TOKEN }}
 
 Forked from an action by [Treo.sh - Page speed monitoring made easy](https://treo.sh).
 
-[![](https://github.com/treosh/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
+[![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
