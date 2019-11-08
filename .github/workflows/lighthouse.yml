@@ -65,7 +65,7 @@ jobs:
       - name: Assert on assertions from rc-file
         uses: ./
         with:
-          urls: 'https://alekseykulikov.com/'
+          urls: 'https://exterkamp.codes/'
           rc_file_path: '.github/lighthouse/rc_file_assertions.json'
           runs: 1
   # TODO(exterkamp): delete this from this repo ;)

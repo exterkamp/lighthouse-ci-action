@@ -147,7 +147,7 @@ Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/Googl
 }
 ```
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516967-74d9a200-023a-11ea-961c-fb4c05513661.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517180-5cb65280-023b-11ea-9de1-bc9f980ed03e.png">
 
 ### Uploading to a LHCI Server
 
@@ -177,7 +177,7 @@ jobs:
           runs: 1
 ```
 
-<!-- TODO(exterkamp): screenshot of this uploading a LHR to a LHCI server. -->
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517237-938c6880-023b-11ea-958f-acd122406057.png">
 
 ### Using Custom Config & Chrome Flags
 
