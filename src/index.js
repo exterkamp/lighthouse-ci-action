@@ -1,8 +1,6 @@
-const { mapKeys } = require('lodash')
 const core = require('@actions/core')
-const { join } = require('path')
-const childProcess = require('child_process');
-const lhciCliPath = require.resolve('@lhci/cli/src/cli.js');
+const childProcess = require('child_process')
+const lhciCliPath = require.resolve('@lhci/cli/src/cli.js')
 
 // audit urls with Lighthouse CI
 async function main() {
@@ -13,11 +11,10 @@ async function main() {
     core.startGroup(`Start ci ${url}`)
     // Collect!
     core.startGroup(`Collecting`)
-    const collectArgs = [`--url=${url}`,
-                  `--numberOfRuns=${numberOfRuns}`]
+    const collectArgs = [`--url=${url}`, `--numberOfRuns=${numberOfRuns}`]
     // TODO(exterkamp): rc-file override for custom-config and Chrome Flags
 
-    let status = await runChildCommand('collect', collectArgs).status;
+    let status = await runChildCommand('collect', collectArgs).status
 
     if (status !== 0) break
     core.endGroup()
@@ -31,14 +28,12 @@ async function main() {
     const uploadArgs = []
 
     if (getLhciServer()) {
-      uploadArgs.push('--target=lhci',
-          `--serverBaseUrl=${getLhciServer()}`,
-          `--token=${getApiToken()}`);
+      uploadArgs.push('--target=lhci', `--serverBaseUrl=${getLhciServer()}`, `--token=${getApiToken()}`)
     } else {
-      uploadArgs.push('--target=temporary-public-storage');
+      uploadArgs.push('--target=temporary-public-storage')
     }
 
-    status = await runChildCommand('upload', uploadArgs).status;
+    status = await runChildCommand('upload', uploadArgs).status
 
     if (status !== 0) break
     core.endGroup()
@@ -67,12 +62,13 @@ main()
  * @return {{status: number}}
  */
 function runChildCommand(command, args = []) {
-  const combinedArgs = [lhciCliPath, command, ...args];
-  const {status = -1} = childProcess.spawnSync(process.argv[0], combinedArgs, {
-    stdio: 'inherit'});
+  const combinedArgs = [lhciCliPath, command, ...args]
+  const { status = -1 } = childProcess.spawnSync(process.argv[0], combinedArgs, {
+    stdio: 'inherit'
+  })
 
-  process.stdout.write('\n');
-  return {status: status || 0};
+  process.stdout.write('\n')
+  return { status: status || 0 }
 }
 
 /**
