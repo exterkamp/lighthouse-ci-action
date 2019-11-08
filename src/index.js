@@ -5,6 +5,7 @@ const { readFileSync } = require('fs')
 
 // audit urls with Lighthouse CI
 async function main() {
+  // TODO(exterkamp): fail if !(url || urls) || !(hasCollect || numberOfRuns)
   const urls = getUrls()
   const numberOfRuns = getRuns()
 
