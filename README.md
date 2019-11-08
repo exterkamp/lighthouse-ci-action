@@ -256,12 +256,6 @@ urls: |
   https://example.com/pricing
 ```
 
-If you need to audit just one URL, use the `url` option:
-
-```yml
-url: https://example.com/
-```
-
 ### `budget_path`
 
 Use a performance budget to keep your page size in check. `Lighthouse CI Action` will fail the build if one of the URLs exceed the budget.
