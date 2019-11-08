@@ -3,8 +3,6 @@
     "collect": {
       "numberOfRuns": 1,
       "settings": {
-        "chromeFlags": ["--disable-gpu", "--no-sandbox", "--no-zygote"],
-        "configPath": ".github/lighthouse/desktop-config.js",
         "extraHeaders": "{\"Cookie\":\"monster=blue\",\"x-men\":\"wolverine\"}"
       }
     }

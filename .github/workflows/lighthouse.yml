@@ -1,20 +1,71 @@
 name: Run action locally
 on: push
 jobs:
-  hermetic-run:
+  # This is a basic fully hermetic run of Lighthouse.
+  hermetic-basic:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Run hermetic Lighthouse action
         uses: ./
         with:
-          urls: 'https://exterkamp.codes/'
+          urls: 'https://alekseykulikov.com/'
           no_upload: true
       - name: Save artifacts
         uses: actions/upload-artifact@v1
         with:
           name: hermetic-artifacts
           path: '.lighthouseci'
+  # This is an advanced fully hermetic run of Lighthouse, using custom config.
+  hermetic-advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use rc-file for Chrome flags and config
+        uses: ./
+        with:
+          urls: 'https://alekseykulikov.com/'
+          rc_file_path: '.github/lighthouse/rc_file_custom_config.json'
+          runs: 1
+          no_upload: true
+      - name: Save artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: hermetic-artifacts
+          path: '.lighthouseci'
+  # This is a basic Lighthouse run over multiple URLs that uses temporary-public-storage.
+  multiple-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Upload to public-repo
+        uses: ./
+        with:
+          urls: |
+            https://alekseykulikov.com/
+            https://treo.sh/
+            https://google.com/
+          runs: 1
+  # This pass/fails a build with a budgets.json. 
+  assert-on-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assert on a budget
+        uses: ./
+        with:
+          urls: 'https://alekseykulikov.com/'
+          budget_path: '.github/lighthouse/passable_budget.json'
+          runs: 1
+  # This pass/fails a build with LHCI assertions via an rc-file.
+  assert-on-rc-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assert on a assertions from rc-file
+        uses: ./
+        with:
+          urls: 'https://exterkamp.codes/'
+          rc_file_path: '.github/lighthouse/rc_file_assertions.json'
+          runs: 1
+  # TODO(exterkamp): delete this from this repo ;)
   populate-ci-server-data:
     runs-on: ubuntu-latest
     steps:
@@ -30,37 +81,3 @@ jobs:
         with:
           name: private-lhci-artifacts
           path: '.lighthouseci'
-  run-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Upload to public-repo
-        uses: ./
-        with:
-          urls: |
-            https://exterkamp.codes/
-            https://google.com/
-          runs: 1
-      - name: Save artifacts
-        uses: actions/upload-artifact@v1
-        with:
-          name: public-repo-artifacts
-          path: '.lighthouseci'
-      - name: Assert on a budget
-        uses: ./
-        with:
-          urls: 'https://exterkamp.codes/'
-          budget_path: '.github/lighthouse/budget.json'
-          runs: 1
-      - name: Assert on a assertions from rc-file
-        uses: ./
-        with:
-          urls: 'https://exterkamp.codes/'
-          rc_file_path: '.github/lighthouse/rc_file_assertions_only.json'
-          runs: 1
-      - name: Use rc-file for Chrome flags and config
-        uses: ./
-        with:
-          urls: 'https://exterkamp.codes/'
-          rc_file_path: '.github/lighthouse/rc_file_collection_only.json'
-          runs: 1
