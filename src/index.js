@@ -134,17 +134,17 @@ function getRcFile() {
 
 function rcHasAssert() {
   if (!getRcFile()) return false
-  const contents = readFileSync(getRcFile(), 'utf8');
-  const rcFile = JSON.parse(contents);
+  const contents = readFileSync(getRcFile(), 'utf8')
+  const rcFile = JSON.parse(contents)
   if ('ci' in rcFile && 'assert' in rcFile.ci) return true
   return false
 }
 
 function rcHasCollect() {
   if (!getRcFile()) return false
-  const contents = readFileSync(getRcFile(), 'utf8');
+  const contents = readFileSync(getRcFile(), 'utf8')
   // TODO(exterkamp): doing this to see if it has "collect" seems dumb
-  const rcFile = JSON.parse(contents);
+  const rcFile = JSON.parse(contents)
   if ('ci' in rcFile && 'collect' in rcFile.ci) return true
   return false
 }
