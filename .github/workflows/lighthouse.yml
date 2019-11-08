@@ -12,6 +12,11 @@ jobs:
             https://exterkamp.codes/
             https://google.com/
           runs: 1
+      - name: Save artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: public-repo-artifacts
+          path: .lighthouseci/*
       - name: Upload to secret-server with secret key
         uses: ./
         with:
@@ -19,11 +24,14 @@ jobs:
           api_token: ${{ secrets.LHCI_API_TOKEN }}
           url: 'https://exterkamp.codes/'
           runs: 1
+      - name: Save artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: private-lhci-artifacts
+          path: .lighthouseci/*
       - name: Assert on a budget
         uses: ./
         with:
-          lhci_server: ${{ secrets.LHCI_SERVER }}
-          api_token: ${{ secrets.LHCI_API_TOKEN }}
           url: 'https://exterkamp.codes/'
           budget_path: '.github/lighthouse/budget.json'
           runs: 1
