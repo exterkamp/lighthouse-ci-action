@@ -1,5 +1,14 @@
 # Lighthouse CI Action
 
+<!-- TODO(exterkamp): prior to merge replace 
+
+https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server 
+
+-with->
+
+https://github.com/treosh/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server 
+-->
+
 > Run Lighthouse in CI using Github Actions.
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525187-e8ec6800-0283-11ea-8e9e-195802366522.png">
@@ -195,7 +204,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-assert-on-budget)
 
-### Asserting Against LHCI assertions.json
+### Asserting Against LHCI lighthouserc
 
 > Use Case: Run Lighthouse and validate against LHCI assertions.
 
