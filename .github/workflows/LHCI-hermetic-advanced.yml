@@ -10,9 +10,9 @@ jobs:
         uses: ./
         with:
           urls: 'https://alekseykulikov.com/'
-          rc_file_path: '.github/lighthouse/rc_file_custom_config.json'
+          rc_path: '.github/lighthouse/rc_file_custom_config.json'
           runs: 1
-          no_upload: true
+          disable_temporary_public_storage: true
       - name: Save .lighthouseci artifacts
         uses: actions/upload-artifact@v1
         with:

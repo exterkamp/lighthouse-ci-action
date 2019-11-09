@@ -29,9 +29,9 @@ function getArgs() {
   let rcCollect = false
   let rcAssert = false
   // Inspect lighthouserc file for malformations
-  const rcFile = getArg('rc_file_path')
-  if (rcFile) {
-    const contents = readFileSync(rcFile, 'utf8')
+  const rcPath = getArg('rc_path')
+  if (rcPath) {
+    const contents = readFileSync(rcPath, 'utf8')
     const rcFileObj = JSON.parse(contents)
     if (!('ci' in rcFileObj)) {
       // Fail and exit
@@ -45,14 +45,14 @@ function getArgs() {
   return {
     urls,
     staticDistDir,
-    canUpload: getArg('no_upload') ? false : true,
+    canUpload: getArg('disable_temporary_public_storage') ? false : true,
     budgetPath: getArg('budget_path'),
     numberOfRuns: getIntArg('runs'),
     lhciServer,
     apiToken,
     rcCollect,
     rcAssert,
-    rcFile
+    rcPath
   }
 }
 

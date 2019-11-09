@@ -23,7 +23,7 @@ async function main() {
   // else LHCI will panic with a non-zero exit code...
 
   if (input.rcCollect) {
-    args.push(`--rc-file=${input.rcFile}`)
+    args.push(`--rc-file=${input.rcPath}`)
     // This should only happen in local testing, when the default is not sent
   } else if (input.numberOfRuns) {
     args.push(`--numberOfRuns=${input.numberOfRuns}`)
@@ -45,7 +45,7 @@ async function main() {
       args.push(`--budgetsFile=${input.budgetPath}`)
     } else {
       // @ts-ignore checked this already
-      args.push(`--rc-file=${input.rcFile}`)
+      args.push(`--rc-file=${input.rcPath}`)
     }
 
     status = await runChildCommand('assert', args)

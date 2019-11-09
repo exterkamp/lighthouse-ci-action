@@ -38,4 +38,7 @@ INPUT_URLS="https://alekseykulikov.com/" INPUT_RC_FILE_PATH=".github/lighthouse/
 # debug custom headers
 python script/simple-server.py # start basic server in a separate tab
 INPUT_URLS="https://alekseykulikov.com/" INPUT_RC_FILE_PATH=".github/lighthouse/rc_file_extra_headers.json" INPUT_RUNS="1" node src/index.js # run and see headers output
+
+# run with a static dist dir
+INPUT_STATIC_DIST_DIR="./dist" INPUT_RUNS="1" node src/index.js
 ```

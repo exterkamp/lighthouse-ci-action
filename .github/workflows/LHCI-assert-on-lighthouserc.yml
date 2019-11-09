@@ -10,5 +10,5 @@ jobs:
         uses: ./
         with:
           urls: 'https://exterkamp.codes/'
-          rc_file_path: '.github/lighthouse/rc_file_assertions.json'
+          rc_path: '.github/lighthouse/rc_file_assertions.json'
           runs: 1
