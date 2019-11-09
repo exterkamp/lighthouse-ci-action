@@ -1,5 +1,3 @@
-'use strict';
-
 const core = require('@actions/core')
 const { readFileSync } = require('fs')
 
@@ -11,10 +9,10 @@ function getArgs() {
     // Fail and exit
     core.setFailed(`Need both an LHCI address and API token`)
     process.exit(1)
-}
+  }
 
-  let rcCollect = false;
-  let rcAssert = false;
+  let rcCollect = false
+  let rcAssert = false
   // Inspect lighthouserc file for malformations
   const rcFile = core.getInput('rc_file_path') || undefined
   if (!!rcFile) {
@@ -30,7 +28,10 @@ function getArgs() {
   }
 
   return {
-    urls: core.getInput('urls').split('\n').map(url => url.trim()),
+    urls: core
+      .getInput('urls')
+      .split('\n')
+      .map(url => url.trim()),
     canUpload: core.getInput('no_upload') == '',
     budgetPath: core.getInput('budget_path') || undefined,
     numberOfRuns: parseInt(core.getInput('runs')) || undefined,
@@ -38,8 +39,8 @@ function getArgs() {
     apiToken,
     rcCollect,
     rcAssert,
-    rcFile,
+    rcFile
   }
 }
 
-module.exports = {getArgs}
+module.exports = { getArgs }

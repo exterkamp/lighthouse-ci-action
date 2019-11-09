@@ -5,8 +5,11 @@ const { getArgs } = require('./input_parser.js')
 
 // audit urls with Lighthouse CI
 async function main() {
-  const input = getArgs();
+  const input = getArgs()
+
+  core.startGroup('Action config')
   console.log('Input args: ', input)
+  core.endGroup()
 
   /** @type {string[]} */
   const failedUrls = []
