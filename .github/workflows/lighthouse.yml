@@ -1,21 +1,6 @@
 name: Run action locally
 on: push
 jobs:
-  # This is a basic fully hermetic run of Lighthouse.
-  hermetic-basic:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Run hermetic Lighthouse action
-        uses: ./
-        with:
-          urls: 'https://alekseykulikov.com/'
-          no_upload: true
-      - name: Save artifacts
-        uses: actions/upload-artifact@v1
-        with:
-          name: basic-hermetic-artifacts
-          path: '.lighthouseci'
   # This is an advanced fully hermetic run of Lighthouse, using custom config.
   hermetic-advanced:
     runs-on: ubuntu-latest
