@@ -21,7 +21,7 @@ and monitor performance with [Lighthouse CI](https://github.com/GoogleChrome/lig
 
 ## Usage
 
-### Basic Action
+### Basic Action [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-hermetic/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-hermetic)
 
 > Use Case: Run Lighthouse on each push to the repo and save the results in action artifacts.
 
@@ -125,7 +125,7 @@ no_upload: 'any value'
 
 ## Advanced Recipes
 
-### Asserting Against Performance budgets.json
+### Asserting Against Performance budgets.json [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-assert-on-budget/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-assert-on-budget)
 
 > Use Case: Run Lighthouse and validate against a budget.
 
@@ -175,7 +175,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516802-ec5b0180-0239-11ea-9c58-d65487494301.png">
 
-### Asserting Against LHCI assertions.json
+### Asserting Against LHCI assertions.json [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-assert-on-lighthouserc/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-assert-on-lighthouserc)
 
 > Use Case: Run Lighthouse and validate against LHCI assertions.
 
@@ -217,7 +217,7 @@ Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/Googl
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517180-5cb65280-023b-11ea-9de1-bc9f980ed03e.png">
 
-### Uploading to a LHCI Server
+### Uploading to a LHCI Server [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-upload-to-private-server/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server)
 
 > Use Case: Providing data to a hosted LHCI server.
 
@@ -247,7 +247,7 @@ jobs:
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517237-938c6880-023b-11ea-958f-acd122406057.png">
 
-### Using Custom Config & Chrome Flags
+### Using Custom Config & Chrome Flags [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-hermetic-advanced/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-hermetic-advanced)
 
 > Use Case: Running Lighthouse with highly custom Lighthouse runtime or custom Chrome flags.
 
@@ -321,7 +321,7 @@ module.exports = {
 }
 ```
 
-### Using a Static Dist Dir [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=static-dist-dir)
+### Using a Static Dist Dir [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/LHCI-static-dist-dir/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-static-dist-dir)
 
 > Use Case: Testing a very basic static site without having to deploy it.
 
@@ -354,5 +354,6 @@ Sponsored by [Treo.sh - Page speed monitoring made easy](https://treo.sh) and [G
 
 <!-- TODO(exterkamp): change back to main on PR -->
 
-[![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=CI)
+[![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=CI)
+
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
