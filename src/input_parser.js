@@ -4,127 +4,42 @@ const core = require('@actions/core')
 const { readFileSync } = require('fs')
 
 function getArgs() {
-  /** @type {{urls: string[], canUpload: boolean, budgetPath?: string, numberOfRuns?: number, lhciServer?: string, apiToken?: string, rcFile?: { path: string, hasCollect: boolean, hasAssert: boolean}}} */
-  const args = {
-    urls: getUrls(),
-    canUpload: canUpload(),
-  }
+  // Make sure we don't have LHCI xor API token
+  const lhciServer = core.getInput('lhci_server') || undefined
+  const apiToken = core.getInput('api_token') || undefined
+  if (!!lhciServer != !!apiToken) {
+    // Fail and exit
+    core.setFailed(`Need both an LHCI address and API token`)
+    process.exit(1)
+}
 
-  // Add optional args
-  if (!!getBudgetPath()) {
-    args.budgetPath = getBudgetPath()
-  }
-
-  if (!!getNumberOfRuns()) {
-    args.numberOfRuns = getNumberOfRuns()
-  }
-
-  // Must have LHCI and API token
-  if (!!getLhciServer() != !!getApiToken()) {
-      // Fail and exit
-      core.setFailed(`Need both an LHCI address and API token`)
-      process.exit(1)
-  }
-
-  if (!!getLhciServer()) {
-    args.lhciServer = getLhciServer()
-  }
-
-  if (!!getApiToken()) {
-    args.apiToken = getApiToken()
-  }
-
-  if (!!getRcFile()) {
-    const contents = readFileSync(getRcFile(), 'utf8')
-    const rcFile = JSON.parse(contents)
-    if (!('ci' in rcFile)) {
+  let rcCollect = false;
+  let rcAssert = false;
+  // Inspect lighthouserc file for malformations
+  const rcFile = core.getInput('rc_file_path') || undefined
+  if (!!rcFile) {
+    const contents = readFileSync(rcFile, 'utf8')
+    const rcFileObj = JSON.parse(contents)
+    if (!('ci' in rcFileObj)) {
       // Fail and exit
       core.setFailed(`rc-file missing top level 'ci' property`)
       process.exit(1)
     }
-
-    args.rcFile = {
-      path: getRcFile(),
-      hasCollect: 'collect' in rcFile.ci,
-      hasAssert: 'assert' in rcFile.ci,
-    }
-
+    rcCollect = 'collect' in rcFileObj.ci
+    rcAssert = 'assert' in rcFileObj.ci
   }
 
-  return args
-}
-
-
-
-
-/**
- * Get urls from `urls`.
- *
- * @return {string[]}
- */
-
-function getUrls() {
-  const urls = core.getInput('urls')
-  return urls.split('\n').map(url => url.trim())
-}
-
-/**
- * Get the path to a budgets.json file.
- *
- * @return {string}
- */
-function getBudgetPath() {
-  const budgetPath = core.getInput('budget_path')
-  return budgetPath
-}
-
-/**
- * Get the path to a rc_file.json file.
- *
- * @return {object | null}
- */
-function getRcFile() {
-  return core.getInput('rc_file_path') || null
-}
-
-/**
- * Get the number of runs.
- * Note: github-actions sends a default of 3.
- *
- * @return {number}
- */
-
-function getNumberOfRuns() {
-  return parseInt(core.getInput('runs'))
-}
-
-/**
- * Get the address of the LH CI server to upload LHRs to.
- *
- * @return {string}
- */
-function getLhciServer() {
-  return core.getInput('lhci_server')
-}
-
-/**
- * Get the API Token to use to upload LHRs to the LH CI server.
- *
- * @return {string}
- */
-function getApiToken() {
-  return core.getInput('api_token')
-}
-
-/**
- * Check if the run can upload, or if the runner has opted out.
- *
- * @return {boolean}
- */
-function canUpload() {
-  const noUpload = core.getInput('no_upload')
-  if (!!noUpload) return false
-  return true
+  return {
+    urls: core.getInput('urls').split('\n').map(url => url.trim()),
+    canUpload: core.getInput('no_upload') == '',
+    budgetPath: core.getInput('budget_path') || undefined,
+    numberOfRuns: parseInt(core.getInput('runs')) || undefined,
+    lhciServer,
+    apiToken,
+    rcCollect,
+    rcAssert,
+    rcFile,
+  }
 }
 
 module.exports = {getArgs}

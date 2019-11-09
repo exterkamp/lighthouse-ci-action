@@ -17,8 +17,8 @@ async function main() {
     core.startGroup(`Collecting`)
     let args = [`--url=${url}`]
 
-    if (input.rcFile && input.rcFile.hasCollect) {
-      args.push(`--rc-file=${input.rcFile.path}`)
+    if (input.rcCollect) {
+      args.push(`--rc-file=${input.rcFile}`)
       // This should only happen in local testing, when the default is not sent
     } else if (input.numberOfRuns) {
       args.push(`--numberOfRuns=${input.numberOfRuns}`)
@@ -32,7 +32,7 @@ async function main() {
     }
     core.endGroup()
 
-    if (input.budgetPath || (input.rcFile && input.rcFile.hasAssert)) {
+    if (input.budgetPath || input.rcAssert) {
       core.startGroup(`Asserting`)
       args = []
 
@@ -40,7 +40,7 @@ async function main() {
         args.push(`--budgetsFile=${input.budgetPath}`)
       } else {
         // @ts-ignore checked this already
-        args.push(`--rc-file=${input.rcFile.path}`)
+        args.push(`--rc-file=${input.rcFile}`)
       }
 
       status = await runChildCommand('assert', args).status
