@@ -33,6 +33,17 @@ jobs:
         with:
           name: advanced-hermetic-artifacts
           path: '.lighthouseci'
+  # This is a run that targets static files using static-dist-dir.
+  static-dist-dir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use rc-file for Chrome flags and config
+        uses: ./
+        with:
+          urls: 'https://alekseykulikov.com/'
+          static_dist_dir: './dist'
+          runs: 1
   # This is a basic Lighthouse run over multiple URLs that uses temporary-public-storage.
   multiple-urls:
     runs-on: ubuntu-latest
