@@ -54,7 +54,7 @@ jobs:
 
 > Note: By default this action will also store the reports to LHCI
 > `temporary-public-storage` when a `lhci_server` is not specified, in order to
-> opt out, send the `no_upload` parameter.
+> opt out, send the `disable_temporary_public_storage` parameter.
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-hermetic)
 
@@ -82,7 +82,7 @@ Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.j
 budget_path: .github/lighthouse/budget.json
 ```
 
-### `rc_file_path`
+### `rc_path`
 
 Set a path to a custom [LHCI rc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for a full control of the Lighthouse enviroment.
 
@@ -94,7 +94,7 @@ Chrome Flags), and CI assertions (via LHCI assertions).
 > and tokens; use `lhci_server` and `api_token` parameters instead.
 
 ```yml
-rc_file_path: ./rc_file.json
+rc_path: ./rc_file.json
 ```
 
 ### `lhci_server`
@@ -117,12 +117,12 @@ Note: use [Github secrets](https://help.github.com/en/actions/automating-your-wo
 api_token: ${{ secrets.LHCI_API_TOKEN }}
 ```
 
-### `no_upload`
+### `disable_temporary_public_storage`
 
 This will opt-out of the default upload to `temporary-public-storage`.
 
 ```yml
-no_upload: 'any value'
+disable_temporary_public_storage: 'any value'
 ```
 
 ## Advanced Recipes
@@ -184,7 +184,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 > Use Case: Run Lighthouse and validate against LHCI assertions.
 
 Create `.github/workflows/main.yml` with the list of URLs to audit
-and identify a `rc_file` with `rc_file_path`.
+and identify a `rc_file` with `rc_path`.
 
 #### main.yml
 
@@ -200,7 +200,7 @@ jobs:
         uses: <<NAME@v1>>
         with:
           urls: 'https://example.com/'
-          rc_file_path: './rc_file.json'
+          rc_path: './rc_file.json'
 ```
 
 Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/assertions.md).
@@ -260,7 +260,7 @@ jobs:
 > Use Case: Running Lighthouse with highly custom Lighthouse runtime or custom Chrome flags.
 
 Create `.github/workflows/main.yml` with the list of URLs to audit and
-identify a `rc_file` with `rc_file_path`.
+identify a `rc_file` with `rc_path`.
 
 #### main.yml
 
@@ -276,7 +276,7 @@ jobs:
         uses: <<NAME@v1>>
         with:
           urls: 'https://example.com/'
-          rc_file_path: './rc_file.json'
+          rc_path: './rc_file.json'
 ```
 
 Chrome flags can be set directly in the `rc-file`'s `collect` section.
