@@ -328,16 +328,16 @@ module.exports = {
 Create `.github/workflows/main.yml` with the path to your static files.
 
 ```yml
-  # This is a run that targets static files using static-dist-dir.
-  static-dist-dir:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Use rc-file for Chrome flags and config
-        uses: <<NAME@v1>>
-        with:
-          static_dist_dir: './dist'
-          runs: 1
+# This is a run that targets static files using static-dist-dir.
+static-dist-dir:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v1
+    - name: Use rc-file for Chrome flags and config
+      uses: <<NAME@v1>>
+      with:
+        static_dist_dir: './dist'
+        runs: 1
 ```
 
 Inside your `static_dist_dir` there should be html files that make up your site.
