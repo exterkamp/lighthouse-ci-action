@@ -32,7 +32,7 @@ function getArgs() {
       .getInput('urls')
       .split('\n')
       .map(url => url.trim()),
-    canUpload: getArg('no_upload'),
+    canUpload: getArg('no_upload') ? false : true,
     budgetPath: getArg('budget_path'),
     numberOfRuns: getIntArg('runs'),
     lhciServer,
