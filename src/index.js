@@ -9,11 +9,7 @@ async function main() {
 
   core.startGroup('Action config')
   console.log('Input args: ', input)
-  core.endGroup()
-
-  /** @type {string[]} */
-  const failedUrls = []
-  core.startGroup(`Starting ci`)
+  core.endGroup() // Action config
 
   /*******************************COLLECTING***********************************/
   core.startGroup(`Collecting`)
@@ -41,7 +37,7 @@ async function main() {
     core.error(`LHCI 'collect' has encountered a problem.`)
     // continue
   }
-  core.endGroup()
+  core.endGroup() // Collecting
 
   /*******************************ASSERTING************************************/
   if (input.budgetPath || input.rcAssert) {
@@ -58,9 +54,10 @@ async function main() {
     status = await runChildCommand('assert', args).status
 
     if (status !== 0) {
-      failedUrls.push('oof')
+      // TODO(exterkamp): Output what urls failed and record a nice rich error.
+      core.setFailed(`Assertions have failed.`)
     }
-    core.endGroup()
+    core.endGroup() // Asserting
   }
   /*******************************UPLOADING************************************/
   if ((input.lhciServer && input.apiToken) || input.canUpload) {
@@ -79,20 +76,8 @@ async function main() {
       core.error(`LHCI 'upload' has encountered a problem.`)
       // continue
     }
-    core.endGroup()
+    core.endGroup() // Uploading
   }
-  core.endGroup()
-
-  // fail last
-  // TODO(exterkamp): use rich failure text from assertion results
-  if (failedUrls.length) {
-    // TODO(exterkamp): use ICU
-    core.setFailed(
-      `Performance budget fails for ${failedUrls.length} URL${failedUrls.length === 1 ? '' : 's'}` +
-        ` (${failedUrls.join(', ')})`
-    )
-  }
-  core.endGroup()
 }
 
 // run `main()`

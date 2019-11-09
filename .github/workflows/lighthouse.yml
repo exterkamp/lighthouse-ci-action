@@ -41,7 +41,6 @@ jobs:
       - name: Use rc-file for Chrome flags and config
         uses: ./
         with:
-          urls: 'https://alekseykulikov.com/'
           static_dist_dir: './dist'
           runs: 1
   # This is a basic Lighthouse run over multiple URLs that uses temporary-public-storage.
