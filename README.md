@@ -191,7 +191,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 ]
 ```
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516802-ec5b0180-0239-11ea-9c58-d65487494301.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525270-cc046480-0284-11ea-9477-af32fce1e5a2.png">
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-assert-on-budget)
 
@@ -235,7 +235,7 @@ Make a `lighthouserc.json` file with [LHCI assertion syntax](https://github.com/
 }
 ```
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517180-5cb65280-023b-11ea-9de1-bc9f980ed03e.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525259-b42ce080-0284-11ea-9fe5-75fbe20853d9.png">
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-assert-on-lighthouserc)
 
@@ -267,7 +267,7 @@ jobs:
           runs: 1
 ```
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68517237-938c6880-023b-11ea-958f-acd122406057.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525219-4c769580-0284-11ea-8407-9f2ea89ae845.png">
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server)
 
@@ -372,7 +372,7 @@ Inside your `static_dist_dir` there should be html files that make up your site.
 LHCI will run a simple static webserver to host the files, then run an audit
 against each of them. More details on this process are in the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md#run-lighthouse-ci).
 
-<!-- TODO(exterkamp): add screenshot of running against a localhost. -->
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525233-6b752780-0284-11ea-832c-e662a099e2ca.png">
 
 [⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-static-dist-dir)
 

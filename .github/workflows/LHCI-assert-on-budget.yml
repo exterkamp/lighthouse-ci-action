@@ -10,5 +10,5 @@ jobs:
         uses: ./
         with:
           urls: 'https://alekseykulikov.com/'
-          budget_path: '.github/lighthouse/impossible_budget.json'
+          budget_path: '.github/lighthouse/passable_budget.json'
           runs: 1
