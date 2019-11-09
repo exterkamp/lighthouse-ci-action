@@ -60,7 +60,9 @@ jobs:
 
 ## Inputs
 
-### `urls` (required)
+### One of these Required
+
+#### `urls`
 
 Provide the list of URLs separated by a new line.
 Each URL is audited using the latest version of Lighthouse and Chrome preinstalled on user machine.
@@ -72,7 +74,22 @@ urls: |
   https://example.com/pricing
 ```
 
-### `budget_path`
+#### `static_dist_dir`
+
+Provide a build directory where a static site's files are located.
+
+> Note: This only applies to _simple static sites_, e.g. static HTML only.
+
+> Protip: Try chaining a build step github action to build a static site into a
+> `static_dist_dir` then running Lighthouse over it.
+
+```yml
+static_dist_dir: './dist'
+```
+
+### Optional
+
+#### `budget_path`
 
 Use a performance budget to keep your page size in check. `Lighthouse CI Action` will fail the build if one of the URLs exceed the budget.
 
@@ -82,7 +99,7 @@ Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.j
 budget_path: .github/lighthouse/budget.json
 ```
 
-### `rc_path`
+#### `rc_path`
 
 Set a path to a custom [lighthouserc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for full control of the Lighthouse enviroment.
 
@@ -97,7 +114,7 @@ Chrome Flags), and CI assertions (via LHCI assertions).
 rc_path: ./lighthouserc.json
 ```
 
-### `disable_temporary_public_storage`
+#### `disable_temporary_public_storage`
 
 This will opt-out of the default upload to `temporary-public-storage`. You can
 find out more about `temporary-public-storage` in the [LHCI repo](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#upload).
@@ -106,21 +123,21 @@ find out more about `temporary-public-storage` in the [LHCI repo](https://github
 disable_temporary_public_storage: 'any value'
 ```
 
-### `lhci_server`
+#### `lhci_server`
 
-Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to. This will replace uploading to `temporary-public-storage` and will ignore the `disable_temporary_public_storage` flag.
+Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) address to send Lighthouse Results to. This will replace uploading to `temporary-public-storage` and will ignore the `disable_temporary_public_storage` flag.
 
-Note: Use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+> Note: Use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 ```yml
 lhci_server: ${{ secrets.LHCI_SERVER }}
 ```
 
-### `api_token`
+#### `api_token`
 
-Specify an API token for the LHCI server.
+Specify an API token for the LHCI server. ([How to generate a token](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md#historical-reports--diffing-lighthouse-ci-server))
 
-Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+> Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 ```yml
 api_token: ${{ secrets.LHCI_API_TOKEN }}
@@ -231,7 +248,7 @@ Make a `lighthouserc.json` file with [LHCI assertion syntax](https://github.com/
 Create `.github/workflows/main.yml` with the list of URLs to audit using lighthouse,
 and identify a `lhci_server` to upload to and an `api_token` to use.
 
-Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+> Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 #### main.yml
 
