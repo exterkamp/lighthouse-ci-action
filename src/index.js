@@ -54,8 +54,6 @@ async function main() {
       // TODO(exterkamp): Output what urls failed and record a nice rich error.
       core.setFailed(`Assertions have failed.`)
       // continue
-    } else {
-      core.setOutput('Assertion Results', 'Pass')
     }
     core.endGroup() // Asserting
   }
