@@ -45,8 +45,8 @@ function getArgs() {
 
 /**
  * Wrapper for core.getInput.
- * 
- * @param {string} arg 
+ *
+ * @param {string} arg
  * @return {string | undefined}
  */
 function getArg(arg) {
@@ -55,8 +55,8 @@ function getArg(arg) {
 
 /**
  * Wrapper for core.getInput for a numeric input.
- * 
- * @param {string} arg 
+ *
+ * @param {string} arg
  * @return {number | undefined}
  */
 function getIntArg(arg) {
