@@ -1,7 +1,7 @@
 name: LHCI-upload-to-private-server
 on: push
 jobs:
-  # TODO(exterkamp): delete this from this repo ;)
+  # This will run Lighthouse on urls, then upload the results to an lhci server.
   populate-ci-server-data:
     runs-on: ubuntu-latest
     steps:
@@ -11,4 +11,4 @@ jobs:
         with:
           lhci_server: ${{ secrets.LHCI_SERVER }}
           api_token: ${{ secrets.LHCI_API_TOKEN }}
-          urls: 'https://exterkamp.codes/'
+          urls: 'https://alekseykulikov.com/'

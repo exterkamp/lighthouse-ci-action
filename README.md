@@ -1,7 +1,5 @@
 # Lighthouse CI Action
 
-<!-- TODO(exterkamp): rename `<<NAME@v1>>` to the action name -->
-
 > Run Lighthouse in CI using Github Actions.
 
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68516729-abfb8380-0239-11ea-8972-d2d5d4a5f3fb.png">
@@ -31,7 +29,7 @@ The results will be stored as a build artifact.
 #### main.yml
 
 ```yml
-name: Lighthouse Audit
+name: Lighthouse
 on: push
 jobs:
   lighthouse:
@@ -39,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Audit URLs using Lighthouse
-        uses: <<NAME@v1>>
+        uses: treosh/lighthouse-ci-action@v1
         with:
           urls: 'https://example.com/'
           runs: 1
@@ -155,15 +153,15 @@ and identify a budget with `budget_path`.
 #### main.yml
 
 ```yml
-name: Lighthouse Audit
+name: Lighthouse
 on: push
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Audit URLs and Assert
-        uses: <<NAME@v1>>
+      - name: Run Lighthouse on urls and validate with budgets.json
+        uses: treosh/lighthouse-ci-action@v1
         with:
           urls: 'https://example.com/'
           budget_path: './budgets.json'
@@ -207,15 +205,15 @@ and identify a `lighthouserc` file with `rc_path`.
 #### main.yml
 
 ```yml
-name: Lighthouse Audit
+name: Lighthouse
 on: push
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Audit URLs and Assert
-        uses: <<NAME@v1>>
+      - name: Run Lighthouse on urls and validate with lighthouserc
+        uses: treosh/lighthouse-ci-action@v1
         with:
           urls: 'https://example.com/'
           rc_path: './lighthouserc.json'
@@ -253,15 +251,15 @@ and identify a `lhci_server` to upload to and an `api_token` to use.
 #### main.yml
 
 ```yml
-name: Lighthouse Audit
+name: Lighthouse
 on: push
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Audit URLs using Lighthouse
-        uses: <<NAME@v1>>
+      - name: Run Lighthouse on urls and upload data to private lhci server
+        uses: treosh/lighthouse-ci-action@v1
         with:
           urls: 'https://example.com/'
           lhci_server: ${{ secrets.LHCI_SERVER }}
@@ -283,15 +281,15 @@ identify a `lighthouserc` file with `rc_path`.
 #### main.yml
 
 ```yml
-name: Lighthouse Audit
+name: Lighthouse
 on: push
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Audit URLs and Assert
-        uses: <<NAME@v1>>
+      - name: Run Lighthouse on urls with lighthouserc
+        uses: treosh/lighthouse-ci-action@v1
         with:
           urls: 'https://example.com/'
           rc_path: './lighthouserc.json'
@@ -356,16 +354,18 @@ module.exports = {
 Create `.github/workflows/main.yml` with the path to your static files.
 
 ```yml
-# This is a run that targets static files using static-dist-dir.
-static-dist-dir:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v1
-    - name: Use rc-file for Chrome flags and config
-      uses: <<NAME@v1>>
-      with:
-        static_dist_dir: './dist'
-        runs: 1
+name: Lighthouse
+on: push
+jobs:
+  static-dist-dir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run Lighthouse against a static dist dir
+        uses: treosh/lighthouse-ci-action@v1
+        with:
+          static_dist_dir: './dist'
+          runs: 1
 ```
 
 Inside your `static_dist_dir` there should be html files that make up your site.
