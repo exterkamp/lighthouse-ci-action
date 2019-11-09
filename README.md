@@ -84,24 +84,33 @@ budget_path: .github/lighthouse/budget.json
 
 ### `rc_path`
 
-Set a path to a custom [LHCI rc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for a full control of the Lighthouse enviroment.
+Set a path to a custom [lighthouserc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for full control of the Lighthouse enviroment.
 
-This `rc_file` can be used to contorl the collection of data (via Lighthouse config, and
+This `lighthouserc` file can be used to contorl the collection of data (via Lighthouse config, and
 Chrome Flags), and CI assertions (via LHCI assertions).
 
-> Note: `rc_files` normally also control the "upload" step. However, this method
+> Note: `lighthouserc` files normally also control the "upload" step. However, this method
 > is incompatible with github secrets and would expose all LHCI server addresses
 > and tokens; use `lhci_server` and `api_token` parameters instead.
 
 ```yml
-rc_path: ./rc_file.json
+rc_path: ./lighthouserc.json
+```
+
+### `disable_temporary_public_storage`
+
+This will opt-out of the default upload to `temporary-public-storage`. You can
+find out more about `temporary-public-storage` in the [LHCI repo](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#upload).
+
+```yml
+disable_temporary_public_storage: 'any value'
 ```
 
 ### `lhci_server`
 
-Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to.
+Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to. This will replace uploading to `temporary-public-storage` and will ignore the `disable_temporary_public_storage` flag.
 
-Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+Note: Use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
 
 ```yml
 lhci_server: ${{ secrets.LHCI_SERVER }}
@@ -115,14 +124,6 @@ Note: use [Github secrets](https://help.github.com/en/actions/automating-your-wo
 
 ```yml
 api_token: ${{ secrets.LHCI_API_TOKEN }}
-```
-
-### `disable_temporary_public_storage`
-
-This will opt-out of the default upload to `temporary-public-storage`.
-
-```yml
-disable_temporary_public_storage: 'any value'
 ```
 
 ## Advanced Recipes
@@ -184,7 +185,7 @@ Make a `budget.json` file with [budgets syntax](https://web.dev/use-lighthouse-f
 > Use Case: Run Lighthouse and validate against LHCI assertions.
 
 Create `.github/workflows/main.yml` with the list of URLs to audit
-and identify a `rc_file` with `rc_path`.
+and identify a `lighthouserc` file with `rc_path`.
 
 #### main.yml
 
@@ -200,12 +201,12 @@ jobs:
         uses: <<NAME@v1>>
         with:
           urls: 'https://example.com/'
-          rc_path: './rc_file.json'
+          rc_path: './lighthouserc.json'
 ```
 
-Make a `rc_file.json` file with [LHCI assertion syntax](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/assertions.md).
+Make a `lighthouserc.json` file with [LHCI assertion syntax](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/assertions.md).
 
-#### rc_file.json
+#### lighthouserc.json
 
 ```json
 {
@@ -260,7 +261,7 @@ jobs:
 > Use Case: Running Lighthouse with highly custom Lighthouse runtime or custom Chrome flags.
 
 Create `.github/workflows/main.yml` with the list of URLs to audit and
-identify a `rc_file` with `rc_path`.
+identify a `lighthouserc` file with `rc_path`.
 
 #### main.yml
 
@@ -276,12 +277,12 @@ jobs:
         uses: <<NAME@v1>>
         with:
           urls: 'https://example.com/'
-          rc_path: './rc_file.json'
+          rc_path: './lighthouserc.json'
 ```
 
 Chrome flags can be set directly in the `rc-file`'s `collect` section.
 
-#### rc_file.json
+#### lighthouserc.json
 
 ```json
 {
@@ -298,9 +299,9 @@ Chrome flags can be set directly in the `rc-file`'s `collect` section.
 
 Custom Lighthouse config can be defined in a seperate Lighthouse config using
 the [custom Lighthouse config syntax](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md).
-This is then referenced by the `rc_file` in the `configPath`.
+This is then referenced by the `lighthouserc` file in the `configPath`.
 
-#### rc_file.json
+#### lighthouserc.json
 
 ```json
 {
@@ -315,7 +316,7 @@ This is then referenced by the `rc_file` in the `configPath`.
 }
 ```
 
-Then put all the custom Lighthouse config in the file referenced in the `rc_file`.
+Then put all the custom Lighthouse config in the file referenced in the `lighthouserc`.
 
 #### lighthouse-config.js
 

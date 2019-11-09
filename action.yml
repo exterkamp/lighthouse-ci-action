@@ -15,7 +15,7 @@ inputs:
   budget_path:
     description: 'Path to a Lighthouse budgets.json file'
   rc_path:
-    description: 'Path to a LHCI rc_file.json file'
+    description: 'Path to a LHCI lighthouserc.json file'
   disable_temporary_public_storage:
     descripton: 'Opt out of saving LHRs to Lighthouse public-temporary-storage'
 outputs:
