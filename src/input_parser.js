@@ -12,7 +12,9 @@ function getArgs() {
   }
   // Warn if specifying both
   if (urls && staticDistDir) {
-    core.warning(`Setting both 'url' and 'static_dist_dir' will ignore urls in 'url' since 'static_dist_dir' has higher priority`)
+    core.warning(
+      `Setting both 'url' and 'static_dist_dir' will ignore urls in 'url' since 'static_dist_dir' has higher priority`
+    )
   }
 
   // Make sure we don't have LHCI xor API token
@@ -80,11 +82,10 @@ function getIntArg(arg) {
  * @param {string} arg
  * @return {string[] | undefined}
  */
-function getList(arg, separator='\n') {
+function getList(arg, separator = '\n') {
   const input = getArg(arg)
   if (!input) return undefined
-  return input.split(separator)
-       .map(url => url.trim())
+  return input.split(separator).map(url => url.trim())
 }
 
 module.exports = { getArgs }
