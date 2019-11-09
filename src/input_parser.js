@@ -2,6 +2,19 @@ const core = require('@actions/core')
 const { readFileSync } = require('fs')
 
 function getArgs() {
+  // Make sure we have either urls or a static-dist-dir
+  const urls = getList('urls')
+  const staticDistDir = getArg('static_dist_dir')
+  if (!urls && !staticDistDir) {
+    // Fail and exit
+    core.setFailed(`Need either 'urls' or a 'static_dist_dir'`)
+    process.exit(1)
+  }
+  // Warn if specifying both
+  if (urls && staticDistDir) {
+    core.warning(`Setting both 'url' and 'static_dist_dir' will ignore urls in 'url' since 'static_dist_dir' has higher priority`)
+  }
+
   // Make sure we don't have LHCI xor API token
   const lhciServer = getArg('lhci_server')
   const apiToken = getArg('api_token')
@@ -28,10 +41,8 @@ function getArgs() {
   }
 
   return {
-    urls: core
-      .getInput('urls')
-      .split('\n')
-      .map(url => url.trim()),
+    urls,
+    staticDistDir,
     canUpload: getArg('no_upload') ? false : true,
     budgetPath: getArg('budget_path'),
     numberOfRuns: getIntArg('runs'),
@@ -61,6 +72,19 @@ function getArg(arg) {
  */
 function getIntArg(arg) {
   return parseInt(core.getInput(arg)) || undefined
+}
+
+/**
+ * Wrapper for core.getInput for a list input.
+ *
+ * @param {string} arg
+ * @return {string[] | undefined}
+ */
+function getList(arg, separator='\n') {
+  const input = getArg(arg)
+  if (!input) return undefined
+  return input.split(separator)
+       .map(url => url.trim())
 }
 
 module.exports = { getArgs }
