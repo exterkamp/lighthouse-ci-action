@@ -30,7 +30,7 @@ async function main() {
   }
   // else, no args and will default to 3 in LHCI.
 
-  let status = await runChildCommand('collect', args).status
+  let status = await runChildCommand('collect', args)
   if (status !== 0) {
     throw new Error(`LHCI 'collect' has encountered a problem.`)
   }
@@ -48,7 +48,7 @@ async function main() {
       args.push(`--rc-file=${input.rcFile}`)
     }
 
-    status = await runChildCommand('assert', args).status
+    status = await runChildCommand('assert', args)
 
     if (status !== 0) {
       // TODO(exterkamp): Output what urls failed and record a nice rich error.
@@ -68,7 +68,7 @@ async function main() {
       args.push('--target=temporary-public-storage')
     }
 
-    status = await runChildCommand('upload', args).status
+    status = await runChildCommand('upload', args)
 
     if (status !== 0) {
       throw new Error(`LHCI 'upload' has encountered a problem.`)
@@ -93,15 +93,13 @@ main()
  *
  * @param {'collect'|'assert'|'upload'} command
  * @param {string[]} [args]
- * @return {{status: number}}
+ * @return {number}
  */
 function runChildCommand(command, args = []) {
-  return {status:command == 'collect' ? 0 : 1}
   const combinedArgs = [lhciCliPath, command, ...args]
   const { status = -1 } = childProcess.spawnSync(process.argv[0], combinedArgs, {
     stdio: 'inherit'
   })
 
-  process.stdout.write('\n')
-  return { status: status || 0 }
+  return status || 0
 }
