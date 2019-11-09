@@ -56,6 +56,75 @@ jobs:
 > `temporary-public-storage` when a `lhci_server` is not specified, in order to
 > opt out, send the `no_upload` parameter.
 
+## Inputs
+
+### `urls` (required)
+
+Provide the list of URLs separated by a new line.
+Each URL is audited using the latest version of Lighthouse and Chrome preinstalled on user machine.
+
+```yml
+urls: |
+  https://example.com/
+  https://example.com/blog
+  https://example.com/pricing
+```
+
+### `budget_path`
+
+Use a performance budget to keep your page size in check. `Lighthouse CI Action` will fail the build if one of the URLs exceed the budget.
+
+Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.json) and [practical use of performance budgets](https://web.dev/use-lighthouse-for-performance-budgets).
+
+```yml
+budget_path: .github/lighthouse/budget.json
+```
+
+### `rc_file_path`
+
+Set a path to a custom [LHCI rc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for a full control of the Lighthouse enviroment.
+
+This `rc_file` can be used to contorl the collection of data (via Lighthouse config, and
+Chrome Flags), and CI assertions (via LHCI assertions).
+
+> Note: `rc_files` normally also control the "upload" step. However, this method
+> is incompatible with github secrets and would expose all LHCI server addresses
+> and tokens; use `lhci_server` and `api_token` parameters instead.
+
+```yml
+rc_file_path: ./rc_file.json
+```
+
+### `lhci_server`
+
+Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to.
+
+Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+
+```yml
+lhci_server: ${{ secrets.LHCI_SERVER }}
+```
+
+### `api_token`
+
+Specify an API token for the LHCI server.
+
+Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
+
+```yml
+api_token: ${{ secrets.LHCI_API_TOKEN }}
+```
+
+### `no_upload`
+
+This will opt-out of the default upload to `temporary-public-storage`.
+
+```yml
+no_upload: 'any value'
+```
+
+## Advanced Recipes
+
 ### Asserting Against Performance budgets.json
 
 > Use Case: Run Lighthouse and validate against a budget.
@@ -252,72 +321,30 @@ module.exports = {
 }
 ```
 
-## Inputs
+### Using a Static Dist Dir [![](https://github.com/exterkamp/lighthouse-ci-action/workflows/CI/badge.svg)](https://github.com/treosh/lighthouse-ci-action/actions?workflow=static-dist-dir)
 
-### `urls` (required)
+> Use Case: Testing a very basic static site without having to deploy it.
 
-Provide the list of URLs separated by a new line.
-Each URL is audited using the latest version of Lighthouse and Chrome preinstalled on user machine.
-
-```yml
-urls: |
-  https://example.com/
-  https://example.com/blog
-  https://example.com/pricing
-```
-
-### `budget_path`
-
-Use a performance budget to keep your page size in check. `Lighthouse CI Action` will fail the build if one of the URLs exceed the budget.
-
-Learn more about the [budget.json spec](https://github.com/GoogleChrome/budget.json) and [practical use of performance budgets](https://web.dev/use-lighthouse-for-performance-budgets).
+Create `.github/workflows/main.yml` with the path to your static files.
 
 ```yml
-budget_path: .github/lighthouse/budget.json
+  # This is a run that targets static files using static-dist-dir.
+  static-dist-dir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use rc-file for Chrome flags and config
+        uses: <<NAME@v1>>
+        with:
+          static_dist_dir: './dist'
+          runs: 1
 ```
 
-### `rc_file_path`
+Inside your `static_dist_dir` there should be html files that make up your site.
+LHCI will run a simple static webserver to host the files, then run an audit
+against each of them. More details on this process are in the [Lighthouse CI docs](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md#run-lighthouse-ci).
 
-Set a path to a custom [LHCI rc file](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/cli.md#configuration) for a full control of the Lighthouse enviroment.
-
-This `rc_file` can be used to contorl the collection of data (via Lighthouse config, and
-Chrome Flags), and CI assertions (via LHCI assertions).
-
-> Note: `rc_files` normally also control the "upload" step. However, this method
-> is incompatible with github secrets and would expose all LHCI server addresses
-> and tokens; use `lhci_server` and `api_token` parameters instead.
-
-```yml
-rc_file_path: ./rc_file.json
-```
-
-### `lhci_server`
-
-Specify a [LHCI server](https://github.com/GoogleChrome/lighthouse-ci) to send Lighthouse Results to.
-
-Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
-
-```yml
-lhci_server: ${{ secrets.LHCI_SERVER }}
-```
-
-### `api_token`
-
-Specify an API token for the LHCI server.
-
-Note: use [Github secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets) to keep your server address hidden!
-
-```yml
-api_token: ${{ secrets.LHCI_API_TOKEN }}
-```
-
-### `no_upload`
-
-This will opt-out of the default upload to `temporary-public-storage`.
-
-```yml
-no_upload: 'any value'
-```
+<!-- TODO(exterkamp): add screenshot of running against a localhost. -->
 
 ---
 

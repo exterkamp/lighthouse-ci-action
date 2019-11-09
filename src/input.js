@@ -88,4 +88,4 @@ function getList(arg, separator = '\n') {
   return input.split(separator).map(url => url.trim())
 }
 
-module.exports = { getArgs }
+module.exports = getArgs()

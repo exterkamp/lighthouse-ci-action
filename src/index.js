@@ -1,14 +1,12 @@
 const core = require('@actions/core')
 const childProcess = require('child_process')
 const lhciCliPath = require.resolve('@lhci/cli/src/cli.js')
-const { getArgs } = require('./input_parser.js')
+const input = require('./input.js')
 
 // audit urls with Lighthouse CI
 async function main() {
-  const input = getArgs()
-
   core.startGroup('Action config')
-  console.log('Input args: ', input)
+  console.log('Input args:', input)
   core.endGroup() // Action config
 
   /*******************************COLLECTING***********************************/
@@ -34,8 +32,7 @@ async function main() {
 
   let status = await runChildCommand('collect', args).status
   if (status !== 0) {
-    core.error(`LHCI 'collect' has encountered a problem.`)
-    // continue
+    throw new Error(`LHCI 'collect' has encountered a problem.`)
   }
   core.endGroup() // Collecting
 
@@ -56,6 +53,7 @@ async function main() {
     if (status !== 0) {
       // TODO(exterkamp): Output what urls failed and record a nice rich error.
       core.setFailed(`Assertions have failed.`)
+      // continue
     }
     core.endGroup() // Asserting
   }
@@ -73,8 +71,7 @@ async function main() {
     status = await runChildCommand('upload', args).status
 
     if (status !== 0) {
-      core.error(`LHCI 'upload' has encountered a problem.`)
-      // continue
+      throw new Error(`LHCI 'upload' has encountered a problem.`)
     }
     core.endGroup() // Uploading
   }
@@ -85,12 +82,10 @@ main()
   .catch(
     /** @param {Error} err */ err => {
       core.setFailed(err.message)
-      process.exit(1)
     }
   )
   .then(() => {
     console.log(`done in ${process.uptime()}s`)
-    process.exit()
   })
 
 /**
@@ -101,6 +96,7 @@ main()
  * @return {{status: number}}
  */
 function runChildCommand(command, args = []) {
+  return {status:command == 'collect' ? 0 : 1}
   const combinedArgs = [lhciCliPath, command, ...args]
   const { status = -1 } = childProcess.spawnSync(process.argv[0], combinedArgs, {
     stdio: 'inherit'
