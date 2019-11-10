@@ -56,8 +56,16 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: lighthouse-results
+          # This will save the Lighthouse results as .json files
           path: '.lighthouseci'
 ```
+
+> Note: to view the reports follow the `temporary-public-storage` link printed
+> out in the action, or download the `json` files from the artifacts and open 
+> them with the [Lighthouse Viewer App](https://googlechrome.github.io/lighthouse/viewer/)
+
+Link to `temporary-public-storage`:
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68536792-76c06580-030d-11ea-8e19-c467e374434e.png">
 
 > Note: By default this action will also store the reports to LHCI
 > `temporary-public-storage` when a `lhci_server` is not specified, in order to

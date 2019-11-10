@@ -9,6 +9,7 @@ jobs:
       - name: Run Lighthouse on urls and upload data to private lhci server
         uses: ./
         with:
-          lhci_server: ${{ secrets.LHCI_SERVER }}
-          api_token: ${{ secrets.LHCI_API_TOKEN }}
+          # TODO(treosh): enable with secrets pointing to your server
+          # lhci_server: ${{ secrets.LHCI_SERVER }}
+          # api_token: ${{ secrets.LHCI_API_TOKEN }}
           urls: 'https://alekseykulikov.com/'
