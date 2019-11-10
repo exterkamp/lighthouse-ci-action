@@ -1,12 +1,12 @@
 # Lighthouse CI Action
 
-<!-- TODO(exterkamp): prior to merge replace 
+<!-- TODO(exterkamp): prior to merge replace
 
-https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server 
+https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server
 
 -with->
 
-https://github.com/treosh/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server 
+https://github.com/treosh/lighthouse-ci-action/actions?workflow=LHCI-upload-to-private-server
 -->
 
 > Run Lighthouse in CI using Github Actions.
@@ -61,7 +61,7 @@ jobs:
 ```
 
 > Note: to view the reports follow the `temporary-public-storage` link printed
-> out in the action, or download the `json` files from the artifacts and open 
+> out in the action, or download the `json` files from the artifacts and open
 > them with the [Lighthouse Viewer App](https://googlechrome.github.io/lighthouse/viewer/)
 
 Link to `temporary-public-storage`:
