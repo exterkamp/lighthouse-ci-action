@@ -71,7 +71,7 @@ Link to `temporary-public-storage`:
 > `temporary-public-storage` when a `lhci_server` is not specified, in order to
 > opt out, send the `disable_temporary_public_storage` parameter.
 
-[⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-hermetic)
+[⚙️ See this workflow in use!](https://github.com/exterkamp/lighthouse-ci-action/actions?workflow=LHCI-multiple-urls)
 
 ## Inputs
 
