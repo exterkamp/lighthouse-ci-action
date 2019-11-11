@@ -4,8 +4,8 @@ const core = require('@actions/core')
 
 /**
  * Log a high level summary of an LHR.
- * 
- * @param {string} resultsPath 
+ *
+ * @param {string} resultsPath
  */
 function logSummary(resultsPath) {
   core.startGroup('Summary')
@@ -14,7 +14,7 @@ function logSummary(resultsPath) {
 
   /** @type {string[]} */
   const seen = []
-  var lhrRegex = /lhr-\d+.json/g;
+  var lhrRegex = /lhr-\d+.json/g
   files
     .filter(file => file.match(lhrRegex))
     .forEach(filePath => {
@@ -39,25 +39,24 @@ function logSummary(resultsPath) {
 
 /**
  * Get a fixed width buffer based on some prefix text.
- * 
- * @param {string} msg 
- * @param {number
- * } length 
+ *
+ * @param {string} msg
+ * @param {number} length
  */
 function buffer(msg, length) {
-  let ret = '';
+  let ret = ''
 
   if (length === undefined) {
-    length = 25;
+    length = 25
   }
 
-  length = length - msg.length - 1;
+  length = length - msg.length - 1
 
   if (length > 0) {
-    ret = ' '.repeat(length);
+    ret = ' '.repeat(length)
   }
 
-  return ret;
+  return ret
 }
 
-module.exports = logSummary;
+module.exports = logSummary
