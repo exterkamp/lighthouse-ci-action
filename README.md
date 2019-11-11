@@ -2,7 +2,7 @@
 
 > Run Lighthouse in CI using Github Actions.
 
-<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68525187-e8ec6800-0283-11ea-8e9e-195802366522.png">
+<img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68569713-a9548600-0413-11ea-94e2-ce8f07df0828.png">
 
 Audit URLs using [Lighthouse](https://developers.google.com/web/tools/lighthouse),
 and monitor performance with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci).
@@ -57,9 +57,22 @@ jobs:
 Link to `temporary-public-storage`:
 <img align="center" width="998" alt="Lighthouse CI Action" src="https://user-images.githubusercontent.com/6392995/68536792-76c06580-030d-11ea-8e19-c467e374434e.png">
 
-> Note: By default this action will also store the reports to LHCI
-> `temporary-public-storage` when a `lhci_server` is not specified, in order to
-> opt out, send the `disable_temporary_public_storage` parameter.
+> Note: By default this action will store `json` results to `.lighthouseci`,
+> setting `temporaryPublicStorage` will upload the LHRs to Lighthouse-ci's 
+> `temporary-public-storage`.
+
+URLs support interpolation of process env vars, so you can write URLs like:
+
+```yml
+- name: Run Lighthouse and test budgets
+  uses: treosh/lighthouse-ci-action@v1
+  with:
+    urls: |
+      https://pr-$PR_NUMBER.staging-example.com/
+      https://pr-$PR_NUMBER.staging-example.com/blog
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+```
 
 [⚙️ See this workflow in use!](https://github.com/treosh/lighthouse-ci-action/actions?workflow=LHCI-multiple-urls)
 
@@ -352,7 +365,7 @@ module.exports = {
 
 > Use Case: Testing a very basic static site without having to deploy it.
 
-Create `.github/workflows/main.yml` and identify a `lighthouserc` file with a 
+Create `.github/workflows/main.yml` and identify a `lighthouserc` file with a
 `staticDistDir` config.
 
 ```yml
