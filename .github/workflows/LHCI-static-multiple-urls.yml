@@ -13,3 +13,8 @@ jobs:
             https://alekseykulikov.com/
             https://treo.sh/
             https://google.com/
+            # Interpolated url
+            https://$ORIGIN.$TLD/
+        env:
+          ORIGIN: treo
+          TLD: sh
