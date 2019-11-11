@@ -2,6 +2,7 @@ const core = require('@actions/core')
 const childProcess = require('child_process')
 const lhciCliPath = require.resolve('@lhci/cli/src/cli.js')
 const input = require('./input.js')
+const printer = require('./printer.js')
 
 // audit urls with Lighthouse CI
 async function main() {
@@ -77,6 +78,9 @@ async function main() {
     }
     core.endGroup() // Uploading
   }
+
+  printer('/../.lighthouseci/')
+
   // set results path
   core.setOutput('resultsPath', '.lighthouserc')
 }
