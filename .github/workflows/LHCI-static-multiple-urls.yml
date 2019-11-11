@@ -10,10 +10,10 @@ jobs:
         uses: ./
         with:
           urls: |
-            https://alekseykulikov.com/
+            https://exterkamp.codes/
             https://treo.sh/
             https://google.com/
-            https://\$ORIGIN.\$TLD/\$PATH
+            https://$ORIGIN.$TLD/$PATH
         env:
           ORIGIN: treo
           TLD: sh
