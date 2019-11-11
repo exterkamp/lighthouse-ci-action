@@ -2,14 +2,49 @@ const core = require('@actions/core')
 const { readFileSync } = require('fs')
 
 function getArgs() {
-  // Make sure we have either urls or a static-dist-dir
-  const urls = getList('urls')
-  const staticDistDir = getArg('static_dist_dir')
-  if (!urls && !staticDistDir) {
+  // Make sure we don't have LHCI xor API token
+  const serverBaseUrl = getArg('serverBaseUrl')
+  const token = getArg('token')
+  if (!!serverBaseUrl != !!token) {
     // Fail and exit
-    core.setFailed(`Need either 'urls' or a 'static_dist_dir'`)
+    core.setFailed(`Need both a LHCI base url and an API token`)
     process.exit(1)
   }
+
+  let rcCollect = false
+  let rcAssert = false
+  let staticDistDir = undefined
+  // Inspect lighthouserc file for malformations
+  const configPath = getArg('configPath')
+  if (configPath) {
+    const contents = readFileSync(configPath, 'utf8')
+    const rcFileObj = JSON.parse(contents)
+    if (!('ci' in rcFileObj)) {
+      // Fail and exit
+      core.setFailed(`Config missing top level 'ci' property`)
+      process.exit(1)
+    }
+    rcCollect = 'collect' in rcFileObj.ci
+    rcAssert = 'assert' in rcFileObj.ci
+
+    // Check if we have a static-dist-dir
+    if (rcCollect) {
+      if ('staticDistDir' in rcFileObj.ci.collect) {
+        staticDistDir = rcFileObj.ci.collect.staticDistDir
+      }
+    }
+  }
+
+  // Get and interpolate URLs
+  const urls = interpolateProcessIntoURLs(getList('urls'))
+
+  // Make sure we have either urls or a static-dist-dir
+  if (!urls && !staticDistDir) {
+    // Fail and exit
+    core.setFailed(`Need either 'urls' in action parameters or a 'static_dist_dir' in lighthouserc file`)
+    process.exit(1)
+  }
+
   // Warn if specifying both
   if (urls && staticDistDir) {
     core.warning(
@@ -17,42 +52,17 @@ function getArgs() {
     )
   }
 
-  // Make sure we don't have LHCI xor API token
-  const lhciServer = getArg('lhci_server')
-  const apiToken = getArg('api_token')
-  if (!!lhciServer != !!apiToken) {
-    // Fail and exit
-    core.setFailed(`Need both an LHCI address and API token`)
-    process.exit(1)
-  }
-
-  let rcCollect = false
-  let rcAssert = false
-  // Inspect lighthouserc file for malformations
-  const rcPath = getArg('rc_path')
-  if (rcPath) {
-    const contents = readFileSync(rcPath, 'utf8')
-    const rcFileObj = JSON.parse(contents)
-    if (!('ci' in rcFileObj)) {
-      // Fail and exit
-      core.setFailed(`rc-file missing top level 'ci' property`)
-      process.exit(1)
-    }
-    rcCollect = 'collect' in rcFileObj.ci
-    rcAssert = 'assert' in rcFileObj.ci
-  }
-
   return {
     urls,
     staticDistDir,
-    canUpload: getArg('disable_temporary_public_storage') ? false : true,
-    budgetPath: getArg('budget_path'),
+    canUpload: getArg('temporaryPublicStorage') ? true : false,
+    budgetPath: getArg('budgetPath'),
     numberOfRuns: getIntArg('runs'),
-    lhciServer,
-    apiToken,
+    serverBaseUrl,
+    token,
     rcCollect,
     rcAssert,
-    rcPath
+    configPath
   }
 }
 
@@ -80,12 +90,31 @@ function getIntArg(arg) {
  * Wrapper for core.getInput for a list input.
  *
  * @param {string} arg
- * @return {string[] | undefined}
+ * @return {string[]}
  */
 function getList(arg, separator = '\n') {
   const input = getArg(arg)
-  if (!input) return undefined
+  if (!input) return []
   return input.split(separator).map(url => url.trim())
+}
+
+/**
+ * Takes a set of URL strings and interpolates
+ * any declared ENV vars into them
+ *
+ * @param {string[]} urls
+ * @return {string[]}
+ */
+function interpolateProcessIntoURLs(urls) {
+  return urls.map(url => {
+    if (!url.includes('$')) return url
+    Object.keys(process.env).forEach(key => {
+      if (url.includes(`${key}`)) {
+        url = url.replace(`$${key}`, `${process.env[key]}`)
+      }
+    })
+    return url
+  })
 }
 
 module.exports = getArgs()

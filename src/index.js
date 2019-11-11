@@ -23,9 +23,11 @@ async function main() {
   // else LHCI will panic with a non-zero exit code...
 
   if (input.rcCollect) {
-    args.push(`--rc-file=${input.rcPath}`)
+    args.push(`--rc-file=${input.configPath}`)
     // This should only happen in local testing, when the default is not sent
-  } else if (input.numberOfRuns) {
+  }
+  // Command line args should override config files
+  if (input.numberOfRuns) {
     args.push(`--numberOfRuns=${input.numberOfRuns}`)
   }
   // else, no args and will default to 3 in LHCI.
@@ -45,7 +47,7 @@ async function main() {
       args.push(`--budgetsFile=${input.budgetPath}`)
     } else {
       // @ts-ignore checked this already
-      args.push(`--rc-file=${input.rcPath}`)
+      args.push(`--rc-file=${input.configPath}`)
     }
 
     status = await runChildCommand('assert', args)
@@ -58,12 +60,12 @@ async function main() {
     core.endGroup() // Asserting
   }
   /*******************************UPLOADING************************************/
-  if ((input.lhciServer && input.apiToken) || input.canUpload) {
+  if ((input.serverBaseUrl && input.token) || input.canUpload) {
     core.startGroup(`Uploading`)
     args = []
 
-    if (input.lhciServer) {
-      args.push('--target=lhci', `--serverBaseUrl=${input.lhciServer}`, `--token=${input.apiToken}`)
+    if (input.serverBaseUrl) {
+      args.push('--target=lhci', `--serverBaseUrl=${input.serverBaseUrl}`, `--token=${input.token}`)
     } else {
       args.push('--target=temporary-public-storage')
     }
@@ -75,6 +77,8 @@ async function main() {
     }
     core.endGroup() // Uploading
   }
+  // set results path
+  core.setOutput('resultsPath', '.lighthouserc')
 }
 
 // run `main()`
