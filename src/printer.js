@@ -198,7 +198,7 @@ function pwaGroups(lhr, ui) {
   // ⊕ pwa-installable
   // ✪ pwa-optimized
 
-  pwaRow(ui, '⊘', lhr, 'pwa-fast-reliable')
+  pwaRow(ui, '⧁'/** ⎉ ⟴ ⧁ ⊘ */, lhr, 'pwa-fast-reliable')
   pwaRow(ui, '⊕', lhr, 'pwa-installable')
   pwaRow(ui, '✪', lhr, 'pwa-optimized')
 }
