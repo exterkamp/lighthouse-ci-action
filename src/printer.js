@@ -172,7 +172,7 @@ function pwaRow(ui, icon, lhr, groupId) {
       pass = false
     }
   })
-  let colorFunc = function (str) {return `${log.dim}${str}${log.reset}`}
+  let colorFunc = function (str) {return log.redify(str)}
   if (pass) {
     colorFunc = function (str) { return log.greenify(str)}
   }
