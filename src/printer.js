@@ -58,7 +58,6 @@ function logSummary(resultsPath) {
           }
         )
         if (category.title === 'Performance') {
-          // ✪ ⊕ ⊘
           perfRow(lhr, ui, 'first-contentful-paint', 'first-meaningful-paint')
           perfRow(lhr, ui, 'speed-index', 'first-cpu-idle')
           perfRow(lhr, ui, 'interactive', 'max-potential-fid')
@@ -139,7 +138,7 @@ function perfRow(lhr, ui, metric1, metric2) {
     },
     {
       text: colorScore(`${lhr.audits[metric1].score}`, `${lhr.audits[metric1].displayValue}`),
-      width: 6,
+      width: 8,
       padding: [0,0,0,1]
     },
     {
@@ -157,10 +156,15 @@ function perfRow(lhr, ui, metric1, metric2) {
     },
     {
       text: colorScore(`${lhr.audits[metric2].score}`, `${lhr.audits[metric2].displayValue}`),
-      width: 6,
+      width: 8,
       padding: [0,0,0,1]
     }
   )
+}
+
+function pwaGroups(lhr, ui) {
+  // ✪ ⊕ ⊘
+
 }
 
 module.exports = {logSummary}
