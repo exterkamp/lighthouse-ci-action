@@ -2,7 +2,7 @@ const { readdirSync, readFileSync } = require('fs')
 const path = require('path')
 const core = require('@actions/core')
 const ui = require('cliui')()
-const chalk = require('chalk');
+const log = require('lighthouse-logger')
 
 /**
  * Log a high level summary of an LHR.
@@ -33,11 +33,13 @@ function logSummary(resultsPath) {
       console.log(lhr.finalUrl)
       for (const key in lhr.categories) {
         const category = lhr.categories[key]
-        let scoreFunc = chalk.red
+        let scoreFunc = log.redify
         if (category.score >= 0.9) {
-          scoreFunc = chalk.green
+          scoreFunc = log.greenify
         } else if (category.score >= 0.5) {
-          scoreFunc = chalk.yellow
+          scoreFunc = function (/** @type {string} */str) {
+            return `${log.yellow}${str}${log.reset}`
+          }
         }
         ui.div(
           {
