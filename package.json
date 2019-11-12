@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@lhci/cli": "0.3.0-alpha.0"
+    "@lhci/cli": "0.3.0-alpha.0",
+    "chalk": "^3.0.0",
+    "cliui": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "10",

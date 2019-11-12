@@ -79,7 +79,7 @@ async function main() {
     core.endGroup() // Uploading
   }
 
-  printer('/../.lighthouseci/')
+  printer.logSummary('/../.lighthouseci/')
 
   // set results path
   core.setOutput('resultsPath', '.lighthouserc')

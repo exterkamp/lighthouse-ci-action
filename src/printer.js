@@ -1,6 +1,8 @@
 const { readdirSync, readFileSync } = require('fs')
 const path = require('path')
 const core = require('@actions/core')
+const ui = require('cliui')()
+const chalk = require('chalk');
 
 /**
  * Log a high level summary of an LHR.
@@ -31,8 +33,57 @@ function logSummary(resultsPath) {
       console.log(lhr.finalUrl)
       for (const key in lhr.categories) {
         const category = lhr.categories[key]
-        console.log('\t' + category.title + ':' + buffer(category.title, 25) + category.score)
+        let scoreFunc = chalk.red
+        if (category.score >= 0.9) {
+          scoreFunc = chalk.green
+        } else if (category.score >= 0.5) {
+          scoreFunc = chalk.yellow
+        }
+        ui.div(
+          {
+            text: '',
+            width: 5
+          },
+          {
+            text: `${category.title}:`,
+            width: 25,
+          },
+          {
+            text: scoreFunc(`${category.score}`),
+          }
+        )
+        if (category.title === 'Performance') {
+          const metrics = lhr.audits.metrics
+          const metricCallouts = ['firstContentfulPaint',
+            'firstMeaningfulPaint',
+            'interactive',
+            'speedIndex',
+            'totalBlockingTime',
+            'firstCPUIdle']
+          
+          metricCallouts.forEach(callout => {
+            ui.div(
+              {
+                text: '',
+                width: 10
+              },
+              {
+                text: `${callout}:`,
+                width: 25,
+              },
+              {
+                text: scoreFunc(`${metrics.details.items[0][callout]}`),
+                width: 6
+              },
+              {
+                text: `${scoreFunc('ms')}`
+              }
+            )
+          })
+        }
       }
+      console.log(ui.toString())
+      ui.resetOutput()
     })
   core.endGroup()
 }
@@ -59,4 +110,4 @@ function buffer(msg, length) {
   return ret
 }
 
-module.exports = logSummary
+module.exports = {logSummary}

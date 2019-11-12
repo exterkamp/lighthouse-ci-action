@@ -21,7 +21,9 @@ INPUT_URLS="https://example.com/" INPUT_RUNS="1" node src/index.js
 
 # run many urls
 INPUT_URLS="https://alekseykulikov.com/
- https://alekseykulikov.com/blog" INPUT_RUNS="1" node src/index.js
+ https://alekseykulikov.com/blog
+ https://google.com/
+ https://exterkamp.codes/" INPUT_RUNS="1" node src/index.js
 
 # fail with budget
 INPUT_URLS="https://alekseykulikov.com/" INPUT_BUDGETPATH=".github/lighthouse/impossible_budget.json" INPUT_RUNS="1" node src/index.js
