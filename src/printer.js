@@ -140,7 +140,7 @@ function perfRow(lhr, ui, metric1, metric2) {
     },
     {
       text: colorScore(`${lhr.audits[metric1].score}`, `${lhr.audits[metric1].displayValue}`),
-      width: 8,
+      width: 9,
       padding: [0,0,0,1]
     },
     {
@@ -158,7 +158,7 @@ function perfRow(lhr, ui, metric1, metric2) {
     },
     {
       text: colorScore(`${lhr.audits[metric2].score}`, `${lhr.audits[metric2].displayValue}`),
-      width: 8,
+      width: 9,
       padding: [0,0,0,1]
     }
   )
